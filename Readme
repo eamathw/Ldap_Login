@@ -2,12 +2,26 @@ Ldap_Login is a piwigo plugin to allow people to connect and get access to a piw
 
 There is an option to allow creation of new users if they are granted access by ldap but don't exist in Piwigo DB.
 
-I have lost interest in this plugin and I am not using Piwigo anymore. Thus, I stop developping it.
+Original work: stephane @ 22decembre.eu.
 
-If you wish to use it, update or upgrade it, please take matter at hands : fork and work on it again. I would be glad if you do.
-I can even explain you some of my code design. But nothing more.
 
-If you fork it (great), and manage to make it work again (better) and even wish to publish again, please contact me: stephane @ 22decembre.eu.
-I would gladly transfer ownership on the Piwigo website.
+# Ldap_Login2
+LDAP authentication plugin for piwigo with user-group support
+_Incompatible with Ldap_login, please deactivate the previous version before using this version_ 
 
-PLEASE UNDERSTAND: I WON'T WORK ANYMORE ON THIS ANYMORE.
+## Exmaple-Config for an M$-AD:
+
+#### LDAP-connection
+**LDAP-Server**: ad.myserver.com</br>
+(x) **Secure connection** _(--> remember that the LDAPS-Server certificate must be imported on your piwigo server)_</br>
+**LDAP-Port**: 636</br>
+
+#### LDAP Attribute
+**Base DN where user can be found (Ex.: ou=users,dc=example,dc=com):**: cn=Users,dc=example,dc=com</br>
+**Attribute that validates the username**: sAMACcountName</br>
+**DN of group for membership-check (memberOf)**: dn=piwigo_users,cn=Users,dc=example,dc=com</br>
+
+#### LDAP-bind references
+**Bind DN in LDAP-style (Ex.: cn=admin,dc=example,dc=com).**: cn=binduser,cn=Users,dc=exmaple,dc=com</br>
+**Bind password**: mysecret123</br>
+</br>
