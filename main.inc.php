@@ -55,6 +55,8 @@ function ld_init(){
 
 function login($success, $username, $password, $remember_me){
 
+	//force users to lowercase name, or else duplicates will be made, like user,User,uSer etc.
+	$username=strtolower($username);
 	global $conf;
 	
 	$obj = new Ldap();
