@@ -141,7 +141,7 @@ class Ldap {
 		$this->write_log("[function]> make_ldap_bind_as");
 		$this->write_log("[make_ldap_bind_as]> \$conn,".$user.",".$user_passwd);
 		$bind = @ldap_bind($conn,$user,$user_passwd);
-		if($bind){
+		if($bind && !(strlen(trim($user_passwd)) == 0)){
 			return true;
 		}
 		return false;
