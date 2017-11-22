@@ -31,7 +31,7 @@ if (isset($_POST['save'])){
 		$me->config['send_password_by_mail_ldap'] = True;
 	} else {
 		$me->config['send_password_by_mail_ldap'] = False;
-
+	}
 	$me->save_config();
 }
 
