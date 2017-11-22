@@ -27,14 +27,7 @@ label
 	{/if}
 	{'Do you allow new piwigo users to be created when users authenticate succesfully on the ldap ?'|@translate}
     </p>
-    
-    <p>
-		<b><label for="users_group">{'Users group'|@translate}</label></b>
-		<br>
-		{'Users members of this ldap group (e.g.: piwigo,users ... , default is void ) can authenticate on piwigo and are created if the option above is selected. If left blank, everyone can authenticate.'|@translate}
-		<input size="70" type="text" id="users_group" name="USERS_GROUP" value="{$USERS_GROUP}" />
-	</p>
-    
+
     <p>
 	{if $ADVERTISE_ADMINS}
 		<input type="checkbox" id="advertise_admin_new_ldapuser" name="ADVERTISE_ADMINS" value="{$ADVERTISE_ADMINS}" checked />
@@ -54,7 +47,7 @@ label
     </p>
     
 </fieldset>
-
+ 
 <p>
 <input type="submit" value="{'Save'|@translate}" name="save" />
 </p>

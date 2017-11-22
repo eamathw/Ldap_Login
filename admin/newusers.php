@@ -1,13 +1,6 @@
 <?php
 if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 
-/*
-*
-*	Here we have everything if valid ldap users are allowed or not to connect to piwigo
-*	Valid ldap users with no piwigo login can create their login this way.
-*
-*/
-
 global $template;
 $template->set_filenames( array('plugin_admin_content' => dirname(__FILE__).'/newusers.tpl') );
 $template->assign(
@@ -17,23 +10,10 @@ $template->assign(
 
 $me = new Ldap();
 $me->load_config();
+//$me = get_plugin_data($plugin_id);
 
-// do we allow new users to have a piwigo login created if they have a valid ldap login ?
-$template->assign('ALLOW_NEWUSERS',	$me->config['allow_newusers']);
-
-// do we send a mail to admins in case of new users ?
-$template->assign('ADVERTISE_ADMINS',	$me->config['advertise_admin_new_ldapuser']);
-
-// do we send the piwigo (!) password to the mail address provided by ldap ?
-$template->assign('SEND_CASUAL_MAIL',	$me->config['send_password_by_mail_ldap']);
-
-// Is there a restriction in the ldap users group ?
-// Only members of this ldap group can log in !
-$template->assign('USERS_GROUP',	$me->config['users_group']);
-
+// Save LDAP configuration when submitted
 if (isset($_POST['save'])){
-
-	$me->config['users_group'] = $_POST['USERS_GROUP'];
 
 	if (isset($_POST['ALLOW_NEWUSERS'])){
 		$me->config['allow_newusers'] = True;
@@ -51,13 +31,20 @@ if (isset($_POST['save'])){
 		$me->config['send_password_by_mail_ldap'] = True;
 	} else {
 		$me->config['send_password_by_mail_ldap'] = False;
-	}
-}
 
-// Save LDAP configuration
-if (isset($_POST['save'])){
 	$me->save_config();
 }
+
+// do we allow to create new piwigo users in case of auth along the ldap ?
+// does he have to belong an ldap group ?
+// does ldap groups give some power ?
+// what do we do when there's no mail in the ldap ?
+// do we send mail to admins ?
+
+// And build up the form with the new values
+$template->assign('ALLOW_NEWUSERS',	$me->config['allow_newusers']);
+$template->assign('ADVERTISE_ADMINS',	$me->config['advertise_admin_new_ldapuser']);
+$template->assign('SEND_CASUAL_MAIL',	$me->config['send_password_by_mail_ldap']);
 
 $template->assign_var_from_handle( 'ADMIN_CONTENT', 'plugin_admin_content');
 ?>
