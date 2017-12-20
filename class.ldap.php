@@ -6,7 +6,7 @@ class Ldap {
 
 	// for debug
 	public function write_log($message){
-		$log = 0;
+		$log = 1;
 		if($log>0){
 			@file_put_contents('/var/log/ldap_login.log',$message."\n",FILE_APPEND);
 		}
@@ -218,7 +218,7 @@ class Ldap {
                         return false;
                 }
 		// Do a memberOf search for the user.
-		$search_filter = "(&(objectclass=posixaccount)(memberOf=$group_dn))";
+		$search_filter = "(|(&(objectclass=posixaccount)(memberOf=$group_dn))(&(objectClass=account)(memberOf=$group_dn)))";
 		$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$user_dn', '$search_filter'");
 		if($search = @ldap_search($this->cnx, $user_dn, $search_filter)){
 			$entries = @ldap_get_entries($this->cnx,$search);
@@ -226,12 +226,11 @@ class Ldap {
 				$find_attr = $this->config['ld_attr'];
 				foreach($entries as $u) { // Cycle through all the entries of the search result.
 					if($u[$find_attr][0] == $user_login){ // Match the attribute provided from the user.
-						$this->write_log("[check_ldap_group_membership]> Return true, match found for $user_login");
+						$this->write_log("[check_ldap_group_membership]> Return true, $find_attr matches $user_login");
 						return true;
-					} else {
-						$this->write_log("[check_ldap_group_membership]> Return false, because $user_login did not match $find_attr");
 					}
 				}
+				$this->write_log("[check_ldap_group_membership]> Return false, $user_login did not match $find_attr");
 			} else {
 				$this->write_log("[check_ldap_group_membership]> $entries[count] entries found. Must be 1.");
 			}
