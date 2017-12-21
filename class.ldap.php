@@ -204,6 +204,7 @@ class Ldap {
 	// look for LDAP group membership
 	public function check_ldap_group_membership($user_dn, $user_login){
 		$group_dn = $this->config['ld_group'];
+		$find_attr = $this->config['ld_attr'];
 		$this->write_log("[function]> check_ldap_group_membership('$user_dn', '$group_dn', '$user_login')");
 		//if no group specified return true
 		if(!$group_dn){
@@ -220,20 +221,16 @@ class Ldap {
 		// Do a memberOf search for the user.
 		$search_filter = "(|(&(objectclass=posixaccount)(memberOf=$group_dn))(&(objectClass=account)(memberOf=$group_dn)))";
 		$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$user_dn', '$search_filter'");
-		if($search = @ldap_search($this->cnx, $user_dn, $search_filter)){
+		if($search = @ldap_search($this->cnx, $user_dn, $search_filter, array($find_attr),0,1)){
 			$entries = @ldap_get_entries($this->cnx,$search);
-			if ($entries['count'] == 1){ // Ensure that there is only one entry returned.
-				$find_attr = $this->config['ld_attr'];
-				foreach($entries as $u) { // Cycle through all the entries of the search result.
-					if($u[$find_attr][0] == $user_login){ // Match the attribute provided from the user.
-						$this->write_log("[check_ldap_group_membership]> Return true, $find_attr matches $user_login");
-						return true;
-					}
+			for($i=0;$i<$entries['count'];$i++){
+				$this->write_log("[check_ldap_group_membership]> Test ".$entries[$i][$find_attr][0]." = ".$user_login."?");
+				if($entries[$i][$find_attr][0] == $user_login){ // Match the attribute provided from the user.
+					$this->write_log("[check_ldap_group_membership]> $find_attr matches $user_login");
+					return true;
 				}
-				$this->write_log("[check_ldap_group_membership]> Return false, $user_login did not match $find_attr");
-			} else {
-				$this->write_log("[check_ldap_group_membership]> $entries[count] entries found. Must be 1.");
 			}
+			$this->write_log("[check_ldap_group_membership]> No matches found for $user_login.");
 		} else {
 			$this->write_log("[check_ldap_group_membership]> ldap_search NOT successful: " .$this->getErrorString());
 		}
