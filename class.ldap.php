@@ -6,7 +6,7 @@ class Ldap {
 
 	// for debug
 	public function write_log($message){
-		$log = 1;
+		$log = 0;
 		if($log>0){
 			@file_put_contents('/var/log/ldap_login.log',$message."\n",FILE_APPEND);
 		}
