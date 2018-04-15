@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: Ldap_Login
-Version: auto
+Version: 2.1
 Description: Allow piwigo authentication along an ldap
-Plugin URI: https://github.com/VSLCatena/ldap_login
+Plugin URI: http://piwigo.org/ext/extension_view.php?eid=650
 Author: Netcie
 Author URI: https://github.com/VSLCatena/
 */
