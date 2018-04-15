@@ -112,7 +112,10 @@ class Ldap {
 				$this->config['uri'] = 'ldap://'.$this->config['host'].':'.$this->config['port'];
 			}
 		}
-
+		if (!extension_loaded('ldap')) {
+			print "LDAP extension not loaded<br>";
+			return false;
+		}
 		if ($conn = @ldap_connect($this->config['uri'])){
 			@ldap_set_option($conn, LDAP_OPT_PROTOCOL_VERSION, 3); // LDAPv3 if possible
 			return $conn;
