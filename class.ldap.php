@@ -4,11 +4,14 @@ class Ldap {
 	var $cnx;
 	var $config;
 
-	// for debug
+	// for debug, put @ before file_put_contents
 	public function write_log($message){
-		$log = 0;
+		$log = 1;
+		$log_path='/var/log/';
+		$ts = date_format(date_create() ,DATE_ATOM);
+		$full = $ts . ": " . $message;
 		if($log>0){
-			@file_put_contents('/var/log/ldap_login.log',$message."\n",FILE_APPEND);
+			file_put_contents($log_path . 'ldap_login.log',$full."\n",FILE_APPEND);
 		}
 	}
 
