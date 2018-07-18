@@ -18,8 +18,11 @@ if (isset($_POST['save'])){
 	$me->config['host'] 	 = $_POST['HOST'];
 	$me->config['basedn']    = $_POST['BASEDN'];
 	$me->config['port']      = $_POST['PORT'];
+	$me->config['ld_server']   = $_POST['LD_SERVER'];
 	$me->config['ld_attr']   = $_POST['LD_ATTR'];
 	$me->config['ld_group']	 = $_POST['LD_GROUP'];
+	$me->config['ld_group_class']	 = $_POST['LD_GROUP_CLASS'];
+	$me->config['ld_group_member_attrib']	 = $_POST['LD_GROUP_MEMBER_ATTRIB'];
 	$me->config['ld_binddn'] = $_POST['LD_BINDDN'];
 	$me->config['ld_bindpw'] = $_POST['LD_BINDPW'];
 
@@ -64,8 +67,11 @@ if (isset($_POST['check_ldap'])){
 $template->assign('HOST', 	$me->config['host']);
 $template->assign('BASEDN',	$me->config['basedn']); // racine !
 $template->assign('PORT', 	$me->config['port']);
+$template->assign('LD_SERVER',	$me->config['ld_server']);
 $template->assign('LD_ATTR',	$me->config['ld_attr']);
 $template->assign('LD_GROUP',	$me->config['ld_group']);
+$template->assign('LD_GROUP_CLASS',	$me->config['ld_group_class']);
+$template->assign('LD_GROUP_MEMBER_ATTRIB',	$me->config['ld_group_member_attrib']);
 $template->assign('LD_USE_SSL',	$me->config['ld_use_ssl']);
 $template->assign('LD_BINDPW',	$me->config['ld_bindpw']);
 $template->assign('LD_BINDDN',	$me->config['ld_binddn']);

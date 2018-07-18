@@ -44,21 +44,54 @@
 	<legend>{'Ldap attributes'|@translate}</legend>
 	<ul>
 		<li>
+			<label for="ld_server">{'Server mode:'|@translate}</label><br>
+				<select name="LD_SERVER" id="ld_server">
+				  <option value="ad" 		{if 'ad' == {$LD_SERVER}}selected{/if}>Active Directory</option>
+				  <option value="openldap"	{if 'openldap' == {$LD_SERVER}}selected{/if}>OpenLDAP</option>
+				</select>
+		</li>
+		<i>{'If using MS AD, choose Active Directory, else choose OpenLDAP'|@translate}</i>		
+		<li>
 			<label for="basedn">{'Base DN'|@translate}</label>
 			<br>
 			<input size="70" type="text" id="basedn" name="BASEDN" value="{$BASEDN}" />
 		</li>
-	
+		<br>
 		<li>
 			<label for="ld_attr">{'Attribute corresponding to the user name'|@translate}</label>
 			<br>
 			<input type="text" id="ld_attr" name="LD_ATTR" value="{$LD_ATTR}" />
 		</li>
+	</ul>
+    </fieldset>
+    <fieldset class="mainConf">
+	<legend>{'Ldap Group attributes'|@translate}</legend>
+	<ul>
 		<li>
-			<label for="groupdn">{'DN of group for membership-check (memberOf)'|@translate}</label>
+			<label for="groupdn">{'DN of group for membership-check and calculated CN (using RegEx)'|@translate}</label>
 			<br>
-			<input size="70" type="text" id="ld_group" name="LD_GROUP" value="{$LD_GROUP}" />
+			<input size="70" type="text" id="ld_group" name="LD_GROUP" value="{$LD_GROUP}" /><input disabled type="text" value='{$LD_GROUP|regex_replace:"/,[a-z]+.*/":""}' />
 		</li>
+		<li>
+		<label for="groupdn_class">{'Class of group:'|@translate}</label>
+		<br>
+		<select name="LD_GROUP_CLASS" id="ld_group_class" >
+		  <option value="group"  		{if 'group' == {$LD_GROUP_CLASS}}selected{/if}>group</option>
+		  <option value="posixgroup" 	{if 'posixgroup' == {$LD_GROUP_CLASS}}selected{/if}>posixGroup</option>
+		</select>
+		</li>
+		<i>{'Depending on server configuration the class may differ, choose accordingly'|@translate}</i>
+		<br>
+		<li>
+		<label for="ld_group_member_attrib">{'Attribute for members in group:'|@translate}</label>
+		<br>
+		<select name="LD_GROUP_MEMBER_ATTRIB" id="ld_group_member_attrib" >
+		  <option value="member"  		{if 'member' == {$LD_GROUP_MEMBER_ATTRIB}}selected{/if}>member</option>
+		  <option value="memberUid" 	{if 'memberUid' == {$LD_GROUP_MEMBER_ATTRIB}}selected{/if}>memberUid</option>
+		</select>
+		</li>
+		<i>{'Depending on server configuration the attribute may differ, choose accordingly'|@translate}</i>
+		
 	</ul>
     </fieldset>
     
