@@ -233,6 +233,35 @@ class Ldap {
                         return false;
                 }
 		if($server_mode =="openldap") {
+
+/* 			OLD CODE THAT SOMEONE REMOVED! :(	
+		// search for all member and memberUid attributes for a group_dn
+		$search_filter = "(|(&(objectClass=posixGroup)(memberUid=$user_login))(&(objectClass=group)(member=$user_dn)))";
+		$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$group_dn', '$search_filter', array('memberOf'),0,1)");
+		if($search = @ldap_search($this->cnx, $group_dn, $search_filter, array("dn"),0,1)){
+			$entry = @ldap_get_entries($this->cnx, $search);
+			//check if there are dn-attributes
+			if (!empty($entry[0]["dn"])) {
+				$this->write_log("[check_ldap_group_membership]> match found: ".$entry[0]["dn"]);
+				return true;			
+			} else {
+				$this->write_log("[check_ldap_group_membership]> no group membership for user found for given group and user, check on ldap side");
+ 			}
+ 		} else {
+			$this->write_log("[check_ldap_group_membership]> ldap_search NOT successfull: " .$this->getErrorString());
+ 		}
+		$this->write_log("[check_ldap_group_membership]> No matching groups found for given group_dn: ". $group_dn);
+ 		return false; */
+ 	
+	
+	
+			
+			
+			
+			
+			
+			
+			
 			$this->write_log("[check_ldap_group_membership]> OpenLDAP Mode");
 			// Do a member search for the user (OpenLDAP)
 			$search_filter = "(&(objectclass=$group_class)($group_cn))"; 
@@ -252,7 +281,8 @@ class Ldap {
 				$this->write_log("[check_ldap_group_membership]> No matches found for $user_login.");
 			} else {
 				$this->write_log("[check_ldap_group_membership]> ldap_search NOT successful: " .$this->getErrorString());
-			}				
+			}
+			
 		}		
 				
 		if($server_mode =="ad" || $server_mode =="" ) {

@@ -25,6 +25,8 @@ include_once(LDAP_LOGIN_PATH.'/class.ldap.php');
 
 add_event_handler('init', 'ld_init');
 
+add_event_handler('blockmanager_apply', 'ld_forgot');
+
 add_event_handler('try_log_user','login', 0, 4);
 
 add_event_handler('get_admin_plugin_menu_links', array(&$ldap, 'ldap_admin_menu'));
@@ -42,6 +44,7 @@ unset($ldap);
 // | functions                                                             |
 // +-----------------------------------------------------------------------+
 
+
 function random_password( $length = 8 ) {
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
     $password = substr( str_shuffle( $chars ), 0, $length );
@@ -50,6 +53,11 @@ function random_password( $length = 8 ) {
 
 function ld_init(){
 	load_language('plugin.lang', LDAP_LOGIN_PATH);
+}
+
+function ld_forgot(){
+	global $template;
+	$template->assign('U_LOST_PASSWORD','' );
 }
 
 
