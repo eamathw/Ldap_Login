@@ -10,6 +10,30 @@
 		<p style="color:red;">{'Warning: LDAP Extension missing.'|@translate}</p>
 		<br />
 	{/if}
+
+
+	<fieldset class="mainConf">
+	<legend>{'General settings'|@translate}</legend>
+	
+	<ul>
+		<li>
+			<label for="forgot_url">{'Url for password reset'|@translate}</label>
+			<br>
+			<input size="70" type="text" id="forgot_url" name="FORGOT_URL" value="{$FORGOT_URL}" />
+		</li>
+		<i>Enter your company directory password reset URL (https://mycompany.com/passreset.php)<br>If empty, it is the default piwigo "password.php"</i>
+
+		<li>
+			<label for="ldap_debug">
+			{if $LDAP_DEBUG }
+				<input type="checkbox" id="ldap_debug" name="LDAP_DEBUG" value="{$LDAP_DEBUG}" checked />
+			{else}
+				<input type="checkbox" id="ldap_debug" name="LDAP_DEBUG" value="{$LDAP_DEBUG}" />
+			{/if}{'Debug LDAP using/var/log/Ldap_login.log'|@translate}</label>
+		</li>
+	</ul>
+
+    </fieldset>
 	
 	<fieldset class="mainConf">
 	<legend>{'Ldap server host connection'|@translate}</legend>
@@ -62,6 +86,7 @@
 			<br>
 			<input type="text" id="ld_attr" name="LD_ATTR" value="{$LD_ATTR}" />
 		</li>
+		<i>For AD it is often 'sAMAccountName'. For OpenLDAP, it is often 'userid'. Please check your directory details for the correct attribute.</i>
 	</ul>
     </fieldset>
     <fieldset class="mainConf">
@@ -80,7 +105,7 @@
 		  <option value="posixgroup" 	{if 'posixgroup' == {$LD_GROUP_CLASS}}selected{/if}>posixGroup</option>
 		</select>
 		</li>
-		<i>{'Depending on server configuration the class may differ, choose accordingly'|@translate}</i>
+		<i>{'Depending on server configuration the class may differ, choose accordingly. OpenLDAP: posixGroup. AD: group.'|@translate}</i>
 		<br>
 		<li>
 		<label for="ld_group_member_attrib">{'Attribute for members in group:'|@translate}</label>
@@ -90,7 +115,7 @@
 		  <option value="memberUid" 	{if 'memberUid' == {$LD_GROUP_MEMBER_ATTRIB}}selected{/if}>memberUid</option>
 		</select>
 		</li>
-		<i>{'Depending on server configuration the attribute may differ, choose accordingly'|@translate}</i>
+		<i>{'Depending on server configuration the attribute may differ, choose accordingly. OpenLDAP: memberUid. AD:member.'|@translate}</i>
 		
 	</ul>
     </fieldset>
@@ -110,7 +135,7 @@
 			<input type="password" id="ld_bindpw" name="LD_BINDPW" />
 		</li>
 	</ul>
-	<i>{'Let the fields blank if the ldap accept anonymous connections.'|@translate}</i>
+	<i>{'Let the fields blank if the ldap accept anonymous connections. '|@translate}</i>
 </fieldset>
  
 <p>

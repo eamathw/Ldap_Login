@@ -15,6 +15,8 @@ $me->load_config();
 
 // Save LDAP configuration when submitted
 if (isset($_POST['save'])){
+
+	$me->config['forgot_url'] 	 = $_POST['FORGOT_URL'];
 	$me->config['host'] 	 = $_POST['HOST'];
 	$me->config['basedn']    = $_POST['BASEDN'];
 	$me->config['port']      = $_POST['PORT'];
@@ -26,12 +28,24 @@ if (isset($_POST['save'])){
 	$me->config['ld_binddn'] = $_POST['LD_BINDDN'];
 	$me->config['ld_bindpw'] = $_POST['LD_BINDPW'];
 
+	if (isset($_POST['LDAP_DEBUG'])){
+		$me->config['ldap_debug'] = True;
+	} else {
+		$me->config['ldap_debug'] = False;
+	}
+
+	if (!isset($_POST['LD_BINDDN']) && !isset($_POST['LD_BINDPW']) ){
+		$me->config['ld_anonbind'] = True;
+	} else {
+		$me->config['ld_anonbind'] = False;
+	}
+
 	if (isset($_POST['LD_USE_SSL'])){
 		$me->config['ld_use_ssl'] = True;
 	} else {
 		$me->config['ld_use_ssl'] = False;
 	}
-
+	
 	$me->save_config();
 }
 
@@ -64,6 +78,8 @@ if (isset($_POST['check_ldap'])){
 }
 
 // And build up the form with the new values
+$template->assign('FORGOT_URL', 	$me->config['forgot_url']);
+$template->assign('LDAP_DEBUG', 	$me->config['ldap_debug']);
 $template->assign('HOST', 	$me->config['host']);
 $template->assign('BASEDN',	$me->config['basedn']); // racine !
 $template->assign('PORT', 	$me->config['port']);

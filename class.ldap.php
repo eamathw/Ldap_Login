@@ -6,11 +6,10 @@ class Ldap {
 
 	// for debug, put @ before file_put_contents
 	public function write_log($message){
-		$log = 1;
 		$log_path='/var/log/';
 		$ts = date_format(date_create() ,DATE_ATOM);
 		$full = $ts . ": " . ($message);
-		if($log>0){
+		if($this->config['ldap_debug']){
 			file_put_contents($log_path . 'ldap_login.log',$full."\n",FILE_APPEND);
 		}
 	}
@@ -46,7 +45,9 @@ class Ldap {
 		return true;
 	}
 
-	public function load_default_config(){
+	public function load_default_pconfig(){
+		$this->config['forgot_url'] = 'password.php';
+		$this->config['ldap_debug'] = False;
 		$this->config['host'] = 'localhost';
 		$this->config['basedn'] = 'ou=people,dc=example,dc=com'; // racine !
 		$this->config['port'] = ''; // if port is empty, I count on the software to care of it !
@@ -138,6 +139,7 @@ class Ldap {
 	public function ldap_bind_as($user,$user_passwd){
 		$this->write_log("[function]> ldap_bind_as");
 		$this->write_log("[ldap_bind_as]> ".$user.",".$user_passwd);
+		
 		if($this->make_ldap_bind_as($this->cnx,$user,$user_passwd)){
 			$this->write_log("[ldap_bind_as]> Bind was successfull");
 			return true;
@@ -150,7 +152,7 @@ class Ldap {
 		$this->write_log("[function]> make_ldap_bind_as");
 		$this->write_log("[make_ldap_bind_as]> \$conn,".$user.",".$user_passwd);
 		$bind = @ldap_bind($conn,$user,$user_passwd);
-		if($bind && !(strlen(trim($user_passwd)) == 0)){
+		if($bind ){
 			return true;
 		}
 		return false;
@@ -269,7 +271,7 @@ class Ldap {
 			$search = ldap_search($this->cnx, $base_dn, $search_filter,array($member_attr),0,0,5); //search for group
 			if($search){
 				$entries = ldap_get_entries($this->cnx,$search); //get group
-				$this->write_log(serialize($entries));
+				$this->write_log("[ldap_get_entries]>". serialize($entries));
 				$memberEntries=$entries[0][strtolower($member_attr)];
 				for($i=0;$i<$memberEntries['count'];$i++){
 					$this->write_log("[check_ldap_group_membership]> Test ".$memberEntries[$i]." = ".$user_login."?");
@@ -288,13 +290,14 @@ class Ldap {
 		if($server_mode =="ad" || $server_mode =="" ) {
 			$this->write_log("[check_ldap_group_membership]> AD Mode");
 			// Do a memberOf search for the user (ONLY AD and default!)
-			$search_filter = "(|(&(objectclass=posixaccount)(memberOf=$group_dn))(&(objectClass=account)(memberOf=$group_dn)))";
-			$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$user_dn', '$search_filter'");
-			if($search = ldap_search($this->cnx, $base_dn, $search_filter, array($find_attr),0,1)){
+			$search_filter = "(&(objectclass=user)(memberOf=$group_dn))";
+			$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$base_dn', '$search_filter'");
+			if($search = ldap_search($this->cnx, $base_dn, $search_filter, array($find_attr),0,0,5)){
 				$entries = ldap_get_entries($this->cnx,$search);
+				$this->write_log("[ldap_get_entries]>" .serialize($entries));
 				for($i=0;$i<$entries['count'];$i++){
-					$this->write_log("[check_ldap_group_membership]> Test ".$entries[$i][$find_attr][0]." = ".$user_login."?");
-					if($entries[$i][$find_attr][0] == $user_login){ // Match the attribute provided from the user.
+					$this->write_log("[check_ldap_group_membership]> Test ".$entries[$i][strtolower($find_attr)][0]." = ".$user_login."?");
+					if($entries[$i][strtolower($find_attr)][0] == $user_login){ // Match the attribute provided from the user.
 						$this->write_log("[check_ldap_group_membership]> $find_attr matches $user_login");
 						return true;
 					}

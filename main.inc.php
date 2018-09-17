@@ -57,17 +57,27 @@ function ld_init(){
 
 function ld_forgot(){
 	global $template;
-	$template->assign('U_LOST_PASSWORD','' );
+	$base = new Ldap();
+	$base->load_config();
+	if(!($base->config['forgot_url']=="")){
+		$template->assign('U_LOST_PASSWORD',$base->config['forgot_url']);
+	}
+	unset($base);
 }
 
 
 function login($success, $username, $password, $remember_me){
-
 	//force users to lowercase name, or else duplicates will be made, like user,User,uSer etc.
 	$username=strtolower($username);
 	global $conf;
 	
+	if(strlen(trim($username)) == 0 || strlen(trim($password)) == 0){
+			trigger_notify('login_failure', stripslashes($username));
+			return false; // wrong user/password or no group access
+	}
+	
 	$obj = new Ldap();
+	$obj->write_log("[function]> login");
 	$obj->load_config();
 	$obj->ldap_conn() or die("Unable to connect LDAP server : ".$ldap->getErrorString());
 

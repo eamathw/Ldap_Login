@@ -38,7 +38,7 @@ Thumbs.db
 
 # Ldap_Login 	   #				
 ####################
-data.dat
+*.dat
 admin/ldap_login_plugin_admin.php
 admin/ldap_login_plugin_admin.tpl
 
