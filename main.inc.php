@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Ldap_Login
-Version: 2.1
+Version: 2.2
 Description: Allow piwigo authentication along an ldap
 Plugin URI: http://piwigo.org/ext/extension_view.php?eid=650
 Author: Netcie
@@ -15,7 +15,7 @@ if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 define('LDAP_LOGIN_ID',      basename(dirname(__FILE__)));
 define('LDAP_LOGIN_PATH' ,   PHPWG_PLUGINS_PATH . LDAP_LOGIN_ID . '/');
 define('LDAP_LOGIN_ADMIN',   get_root_url() . 'admin.php?page=plugin-' . LDAP_LOGIN_ID);
-define('LDAP_LOGIN_VERSION', '1.2');
+define('LDAP_LOGIN_VERSION', '2.2');
 
 include_once(LDAP_LOGIN_PATH.'/class.ldap.php');
 
@@ -24,6 +24,8 @@ include_once(LDAP_LOGIN_PATH.'/class.ldap.php');
 // +-----------------------------------------------------------------------+
 
 add_event_handler('init', 'ld_init');
+
+add_event_handler('blockmanager_apply', 'ld_forgot');
 
 add_event_handler('try_log_user','login', 0, 4);
 
@@ -42,6 +44,7 @@ unset($ldap);
 // | functions                                                             |
 // +-----------------------------------------------------------------------+
 
+
 function random_password( $length = 8 ) {
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-=+;:,.?";
     $password = substr( str_shuffle( $chars ), 0, $length );
@@ -52,14 +55,29 @@ function ld_init(){
 	load_language('plugin.lang', LDAP_LOGIN_PATH);
 }
 
+function ld_forgot(){
+	global $template;
+	$base = new Ldap();
+	$base->load_config();
+	if(!($base->config['forgot_url']=="")){
+		$template->assign('U_LOST_PASSWORD',$base->config['forgot_url']);
+	}
+	unset($base);
+}
+
 
 function login($success, $username, $password, $remember_me){
-
 	//force users to lowercase name, or else duplicates will be made, like user,User,uSer etc.
 	$username=strtolower($username);
 	global $conf;
 	
+	if(strlen(trim($username)) == 0 || strlen(trim($password)) == 0){
+			trigger_notify('login_failure', stripslashes($username));
+			return false; // wrong user/password or no group access
+	}
+	
 	$obj = new Ldap();
+	$obj->write_log("[function]> login");
 	$obj->load_config();
 	$obj->ldap_conn() or die("Unable to connect LDAP server : ".$ldap->getErrorString());
 

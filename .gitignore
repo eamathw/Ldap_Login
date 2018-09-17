@@ -35,3 +35,11 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Ldap_Login 	   #				
+####################
+*.dat
+admin/ldap_login_plugin_admin.php
+admin/ldap_login_plugin_admin.tpl
+
+
