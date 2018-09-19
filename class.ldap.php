@@ -45,7 +45,7 @@ class Ldap {
 		return true;
 	}
 
-	public function load_default_pconfig(){
+	public function load_default_config(){
 		$this->config['forgot_url'] = 'password.php';
 		$this->config['ldap_debug'] = False;
 		$this->config['host'] = 'localhost';
