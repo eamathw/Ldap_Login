@@ -289,23 +289,36 @@ class Ldap {
 				
 		if($server_mode =="ad" || $server_mode =="" ) {
 			$this->write_log("[check_ldap_group_membership]> AD Mode");
+			
+			// Pagination
+			$cookie= '';
+			$pageSize=1000;
+
 			// Do a memberOf search for the user (ONLY AD and default!)
 			$search_filter = "(&(objectclass=user)(memberOf=$group_dn))";
 			$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$base_dn', '$search_filter'");
-			if($search = ldap_search($this->cnx, $base_dn, $search_filter, array($find_attr),0,0,5)){
-				$entries = ldap_get_entries($this->cnx,$search);
-				$this->write_log("[ldap_get_entries]>" .serialize($entries));
-				for($i=0;$i<$entries['count'];$i++){
-					$this->write_log("[check_ldap_group_membership]> Test ".$entries[$i][strtolower($find_attr)][0]." = ".$user_login."?");
-					if($entries[$i][strtolower($find_attr)][0] == $user_login){ // Match the attribute provided from the user.
-						$this->write_log("[check_ldap_group_membership]> $find_attr matches $user_login");
-						return true;
+
+			do {
+				ldap_control_paged_result($this->cnx, $pageSize, true, $cookie);
+						
+			
+				if($search = ldap_search($this->cnx, $base_dn, $search_filter, array($find_attr),0,0,5)){
+					$this->write_log("[ldap_get_entries]> Found: " .  ldap_count_entries($this->cnx, $search));
+					$entries = ldap_get_entries($this->cnx,$search);
+					$this->write_log("[ldap_get_entries]>" .serialize($entries));
+					for($i=0;$i<$entries['count'];$i++){
+						$this->write_log("[check_ldap_group_membership]> Test ".$entries[$i][strtolower($find_attr)][0]." = ".$user_login."?");
+						if($entries[$i][strtolower($find_attr)][0] == $user_login){ // Match the attribute provided from the user.
+							$this->write_log("[check_ldap_group_membership]> $find_attr matches $user_login");
+							return true;
+						}
 					}
+					$this->write_log("[check_ldap_group_membership]> No matches found for $user_login.");
+				} else {
+					$this->write_log("[check_ldap_group_membership]> ldap_search NOT successful: " .$this->getErrorString());
 				}
-				$this->write_log("[check_ldap_group_membership]> No matches found for $user_login.");
-			} else {
-				$this->write_log("[check_ldap_group_membership]> ldap_search NOT successful: " .$this->getErrorString());
-			}
+				ldap_control_paged_result_response($conn, $result, $cookie);
+			} while ($cookie !== null && $cookie !='');
 		}
 		return false;
 	}
