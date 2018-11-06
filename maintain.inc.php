@@ -1,14 +1,6 @@
 <?php
 defined('PHPWG_ROOT_PATH') or die('Hacking attempt!');
 
-if (!defined('LDAP_LOGIN_ID')) {
-  define('LDAP_LOGIN_ID',      basename(dirname(__FILE__)));
-}
-if (!defined('LDAP_LOGIN_PATH'))
-{
-  define('LDAP_LOGIN_PATH' ,   PHPWG_PLUGINS_PATH . LDAP_LOGIN_ID . '/');
-}
-
 include_once('class.ldap.php');
 
 /**
