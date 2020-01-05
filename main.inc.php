@@ -140,7 +140,7 @@ function login($success, $username, $password, $remember_me){
 	$obj->load_config();
 	$obj->write_log("New LDAP Instance");
 	$obj->write_log("[function]> login");
-	$obj->ldap_conn() or die("Unable to connect LDAP server : ".$ldap->getErrorString());
+	$obj->ldap_conn() or die("Unable to connect LDAP server : ".$obj->getErrorString());
 
 	$user_dn = $obj->ldap_search_dn($username);	// retrieve the userdn
 
