@@ -12,6 +12,7 @@ _Incompatible with other LDAP plugins, please deactivate the previous version be
 
 ## Default config:
 Most settings can be changed when the plugin activates and you visit configuration page.
+
 Param 						| Default Value 						| Comment
 ------------ 					| ------------- 				| -------------
 **ld_forgot_url**					| password.php 					| custom password forget link
