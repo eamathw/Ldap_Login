@@ -29,9 +29,7 @@ $ldap->load_config();
 if (isset($ldap->config['ld_sync_data'])){
 	$ld_sync_data = unserialize($ldap->config['ld_sync_data']); #retrieve from config file
 }
-else{
-	$ld_sync_data = null;
-}
+
 
 ###
 ### Debug
