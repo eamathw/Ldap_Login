@@ -25,29 +25,39 @@ $ldap = new Ldap();
 $ldap->load_config();
 
 
-
+//initialize ld_sync_data if exist
 if (isset($ldap->config['ld_sync_data'])){
 	$ld_sync_data = unserialize($ldap->config['ld_sync_data']); #retrieve from config file
 }
-
+else{
+	$ld_sync_data = null;
+}
 
 ###
 ### Debug
 ###
  
-if(isset($_POST['sync_action'])){
+/* if(isset($_POST['sync_action'])){
 	echo('<div style="margin-left:220px;"><pre>'); 
 	print_r($ldap->config);
 	print_r($ld_sync_data);
 	print_r($_POST);
 	echo("</pre></div>"); 
 	//die;
-}
+} */
 
 ###
 ### Functions
 ### 
 function sync_create_group($groups){
+/**
+ * Creates missing groups based on Group Management settings
+ * 		$groups = 'piwigo_groupname'
+ *
+ *
+ * @since 2.10.1
+ *
+ */
 	global $page;
 	foreach($groups as $key => $value){
 		//CREATE GROUPS
@@ -93,6 +103,14 @@ function sync_create_group($groups){
 }
 
 function sync_get_groups(){
+/**
+ * Get all piwigo groups
+ * 		
+ *
+ *
+ * @since 2.10.1 
+ *
+ */
 	$query = '
 		SELECT id, name
 		  FROM `'.GROUPS_TABLE.'`
@@ -107,6 +125,14 @@ function sync_get_groups(){
 }
 
 function sync_get_users($q2a=False){
+/**
+ * Get all piwigo users
+ * 		
+ *
+ *
+ * @since 2.10.1 
+ *
+ */
 	$query = '
 		SELECT id, username
 		  FROM `'.USERS_TABLE.'` WHERE id >2
@@ -127,6 +153,14 @@ function sync_get_users($q2a=False){
 }
   
 function sync_usergroups_del($active){
+/**
+ * Delete usergroups data for active groups in group management
+ * 	$active = groupid	
+ *
+ *
+ * @since 2.10.1 
+ *
+ */
 	// destruction of the users links for this group
 	$query = '
 	DELETE
@@ -138,6 +172,16 @@ function sync_usergroups_del($active){
 } 
 
 function sync_usergroups_add($active,$grouplist,$userlist){
+/**
+ * Add new users in Piwigo to active grouplist if LDAP has same group/user
+ * 	$active=active groups + name users
+ *  $grouplist = name/id
+ *  $userlist = name/id 
+ *
+ *
+ * @since 2.10.1 
+ *
+ */
 	$inserts = array();
 	foreach ($active as $k1=>$v1){ //going through each active group
 			foreach($v1 as $k2=>$v2){ //for every user in that group
