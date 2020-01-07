@@ -37,14 +37,14 @@ else{
 ### Debug
 ###
  
-/* if(isset($_POST['sync_action'])){
+ if(isset($_POST['sync_action'])){
 	echo('<div style="margin-left:220px;"><pre>'); 
 	print_r($ldap->config);
 	print_r($ld_sync_data);
 	print_r($_POST);
 	echo("</pre></div>"); 
 	//die;
-} */
+} 
 
 ###
 ### Functions
@@ -204,6 +204,15 @@ function sync_usergroups_add($active,$grouplist,$userlist){
 } 
   
 function sync_ldap(){
+	
+-/**
+- * Removes users not in LDAP/Minimum group
+- *
+- *
+- * @since 2.10.1
+- *
+- */
+
 	$users = sync_get_users();	
 	global $ldap;
 	$users_ldap=$ldap->getUsers();
@@ -232,16 +241,19 @@ if (isset($_POST['sync_action'])){
 	if($_POST['sync_action'] =='Submit') {
 	
 		//activate groups.
-		foreach($ld_sync_data[0] as $key=>$value){
-			if(isset($_POST['sync']['groups'][$key])) {
-				$ld_sync_data[0][$key]['active']=True; 
-			} 
-			else {
-				$ld_sync_data[0][$key]['active']=False; 
+		if(!($ld_sync_data==null)){
+			foreach($ld_sync_data[0] as $key=>$value){
+				if(isset($_POST['sync']['groups'][$key])) {
+					$ld_sync_data[0][$key]['active']=True; 
+				} 
+				else {
+					$ld_sync_data[0][$key]['active']=False; 
+				}
 			}
+			
 		}
 		//save to database for activation.
-		$ldap->config['ld_sync_data'] = serialize($ld_sync_data);
+		$ldap->config['ld_group_basedn']=$_POST['ld_group_basedn'];
 		$ldap->save_config();			
 		
 		
@@ -283,6 +295,9 @@ if (isset($_POST['sync_action'])){
 	//Refresh button on page.
 	if ($_POST['sync_action'] =='Refresh'){ 
 		$ld_sync_data = $ldap->ldap_get_groups($ldap->config['ld_group_basedn']);
+		$ldap->config['ld_sync_data']=serialize($ld_sync_data);
+		$ldap->save_config();
+		
 
 ###
 ### Debug
