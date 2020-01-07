@@ -37,14 +37,14 @@ else{
 ### Debug
 ###
  
- if(isset($_POST['sync_action'])){
+/*  if(isset($_POST['sync_action'])){
 	echo('<div style="margin-left:220px;"><pre>'); 
 	print_r($ldap->config);
 	print_r($ld_sync_data);
 	print_r($_POST);
 	echo("</pre></div>"); 
 	//die;
-} 
+}  */
 
 ###
 ### Functions
