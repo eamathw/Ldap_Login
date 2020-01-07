@@ -184,6 +184,7 @@ function sync_usergroups_add($active,$grouplist,$userlist){
  */
 	$inserts = array();
 	foreach ($active as $k1=>$v1){ //going through each active group
+			$page['infos'][] = l10n('group "%s" synced "%s" users',$k1,count($v2));																	  
 			foreach($v1 as $k2=>$v2){ //for every user in that group
 				if($v2['objectclass']=='inetOrgPerson'){ //only if it is an user						
 					$inserts[]=array(
@@ -203,18 +204,12 @@ function sync_usergroups_add($active,$grouplist,$userlist){
 } 
   
 function sync_ldap(){
-/**
- * Removes users not in LDAP/Minimum group 
- *
- *
- * @since 2.10.1 
- *
- */
 	$users = sync_get_users();	
 	global $ldap;
 	$users_ldap=$ldap->getUsers();
 	$diff = array_diff_key($users, array_flip($users_ldap));
 	global $page;
+	$page['infos'][] = l10n('"%s" users removed:', count($diff));															  
 	foreach($diff as $username => $id){
 		if($id >2){
 			delete_user($id);

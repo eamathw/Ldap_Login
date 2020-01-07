@@ -56,8 +56,10 @@ if (isset($_POST['save']) or isset($_POST['savetest'])){
 	$me->config['ld_group_admin']   = $_POST['LD_GROUP_ADMIN'];
 	$me->config['ld_group_webmaster']   = $_POST['LD_GROUP_WEBMASTER'];
 	
-	$me->config['ld_binddn'] = ldap_escape($_POST['LD_BINDDN'], '', LDAP_ESCAPE_DN);
-	$me->config['ld_bindpw'] =  ldap_escape($_POST['LD_BINDPW'], '', LDAP_ESCAPE_DN);
+	$me->config['ld_binddn'] = $_POST['LD_BINDDN']; //reverted, did not work
+	//$me->config['ld_binddn'] = ldap_escape($_POST['LD_BINDDN'], '', LDAP_ESCAPE_DN);
+	$me->config['ld_bindpw'] =  $_POST['LD_BINDPW']; //reverted, did not work
+	//$me->config['ld_bindpw'] =  ldap_escape($_POST['LD_BINDPW'], '', LDAP_ESCAPE_DN);
 
 	if (isset($_POST['LD_DEBUG'])){
 		$me->config['ld_debug'] = 1;
