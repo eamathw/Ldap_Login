@@ -9,7 +9,7 @@ class Ldap {
 	var $warn_msg = array();
 	var	$default_val = array(
 		'ld_forgot_url' => 'password.php',
-		'ld_debug_location' =>'./plugins/Ldap_login/logs/',
+		'ld_debug_location' =>'./plugins/Ldap_Login/logs/',
 		'ld_debug' => 1,
 		'ld_debug_clearupdate' => 1,
 		'ld_debug_level' => 'debug',
