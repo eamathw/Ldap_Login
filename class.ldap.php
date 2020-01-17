@@ -197,6 +197,7 @@ class Ldap {
 			return false;
 		}
 		if ($conn = @ldap_connect($this->config['uri'])){
+        	@ldap_set_option($conn, LDAP_OPT_REFERRALS, 0);
 			@ldap_set_option($conn, LDAP_OPT_PROTOCOL_VERSION, 3); // LDAPv3 if possible
 			$this->write_log("[make_ldap_conn]> connected (LDAP_OPT_PROTOCOL_VERSION 3)");
 			return $conn;
@@ -351,7 +352,7 @@ class Ldap {
 		if($search){
 			$entries = ldap_get_entries($this->cnx,$search); //get group
 			if($entries['count']>0){
-				if(config['ld_membership_user']==0){
+				if($this->config['ld_membership_user']==0){
 					$this->write_log("[check_ldap_group_membership]> Found user using (&(objectclass=$group_class)(cn=$group_cn)(member=$user_dn)($group_filter))");
 					return true;
 				}
@@ -380,7 +381,11 @@ class Ldap {
 		
 	}
 
-	function getUsers($groupDN=null){
+	function getUsers($groupDN=null, $attrib='cn'){
+    	$ld_basedn=$this->config['ld_basedn'];
+    	//if(!$this->make_ldap_bind_as($this->cnx,$this->config['ld_binddn'],$this->config['ld_bindpw'])){
+		//	return false;
+    	//}
 		//get users or gets plain (no recursive) users from group
 		if(!isset($groupDN)){
 			$group_cn = $this->config['ld_group_user_active'] ? ldap_explode_dn($this->config['ld_group_user'],1)[0]:null;
@@ -392,27 +397,39 @@ class Ldap {
 		if(!$group_cn){ 
 			//full users search
 			$search_filter = "(&(objectclass=".$this->config['ld_user_class']."))"; 
-			$search = ldap_search($this->cnx, $this->config['ld_basedn'], $search_filter,array('cn'),0,0,5); //search for group
+			$search = ldap_search($this->cnx, $ld_basedn, $search_filter,array($attrib),0,0,5); //search for group
 			$entries = ldap_get_entries($this->cnx,$search); //get users
 			unset($entries['count']);
 			$ldap_users=array();
 			foreach($entries as $k=>$v){
-				$ldap_users[]=$v['cn'][0];
+				$ldap_users[]=$v[$attrib][0];
 			}
 		}
 		else {
 			//user in usergroup search
 			$search_filter = "(&(objectclass=".$this->config['ld_group_class'].")(cn=".$group_cn."))";
-			$search = ldap_search($this->cnx, $this->config['ld_basedn'], $search_filter,array('member'),0,0,5); //search for group
-			$entries = ldap_get_entries($this->cnx,$search); //get users
-			unset($entries[0]['member']['count']);
-			$ldap_users=array();
-			foreach($entries[0]['member'] as $k=>$v){
-				$ldap_users[]=ldap_explode_dn($v,1)[0];
-			}				
-		}
-		return $ldap_users;
-	}
+        	$this->write_log('[getUsers] -> ldap_search($this->cnx, ' . $ld_basedn . ', ' . $search_filter . ',array("member"),0,0,5); ');
+        	if($search = ldap_search($this->cnx,$ld_basedn,$search_filter,array('member'),0,0,5)){ //search for group
+				$entries = ldap_get_entries($this->cnx,$search); //get users
+				unset($entries[0]['member']['count']);
+				$ldap_users=array();
+        		print_r($entries);die;
+				if($attrib != 'cn'){
+					foreach($entries[0]['member'] as $k=>$v){
+						$sr = ldap_read($this->cnx, $v, '*', $attrib);
+						$entry = ldap_get_entries($this->cnx, $sr);
+						$ldap_users[] = $entry[0][$attrib][0];
+					}
+				}
+				else {
+					foreach($entries[0]['member'] as $k=>$v){
+						$ldap_users[]=ldap_explode_dn($v,1)[0];
+					}
+				}				
+			return $ldap_users;
+            }
+        }	
+     }		
 
 	public function getAttr() {
 		$this->write_log("[function]> getAttr ");
