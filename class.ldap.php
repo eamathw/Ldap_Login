@@ -17,7 +17,7 @@ class Ldap {
 		'ld_port' => '389', 
 		'ld_basedn' => 'ou=base,dc=example,dc=com',
 		'ld_user_class' => 'person',
-		'ld_user_attr' => 'sAMAccountName',
+		'ld_user_attr' => 'samaccountName',
 		'ld_user_filter' => null, 
 		'ld_group_class' => 'group',
 		'ld_group_filter' => null,
@@ -383,9 +383,9 @@ class Ldap {
 
 	function getUsers($groupDN=null, $attrib='cn'){
     	$ld_basedn=$this->config['ld_basedn'];
-    	//if(!$this->make_ldap_bind_as($this->cnx,$this->config['ld_binddn'],$this->config['ld_bindpw'])){
-		//	return false;
-    	//}
+    	if(!$this->make_ldap_bind_as($this->cnx,$this->config['ld_binddn'],$this->config['ld_bindpw'])){
+			return false;
+    	}
 		//get users or gets plain (no recursive) users from group
 		if(!isset($groupDN)){
 			$group_cn = $this->config['ld_group_user_active'] ? ldap_explode_dn($this->config['ld_group_user'],1)[0]:null;
@@ -411,16 +411,30 @@ class Ldap {
         	$this->write_log('[getUsers] -> ldap_search($this->cnx, ' . $ld_basedn . ', ' . $search_filter . ',array("member"),0,0,5); ');
         	if($search = ldap_search($this->cnx,$ld_basedn,$search_filter,array('member'),0,0,5)){ //search for group
 				$entries = ldap_get_entries($this->cnx,$search); //get users
-				unset($entries[0]['member']['count']);
+				unset($entries[0][0]);
+           		unset($entries[0][1]);
+          		unset($entries[0]['count']);
+           		unset($entries[0]['dn']);
+				unset($entries[0]['member']);
+            	$ke=array_keys($entries[0]);
 				$ldap_users=array();
-        		print_r($entries);die;
+        		
 				if($attrib != 'cn'){
-					foreach($entries[0]['member'] as $k=>$v){
-						$sr = ldap_read($this->cnx, $v, '*', $attrib);
-						$entry = ldap_get_entries($this->cnx, $sr);
-						$ldap_users[] = $entry[0][$attrib][0];
-					}
+                	foreach($ke as $key => $val){
+                    	//print_r($val);
+                    	unset ($entries[0][$val]['count']);
+						foreach($entries[0][$val] as $k=>$v){                 	
+							$sr = ldap_read($this->cnx, $v, '(objectClass=*)', array($attrib));
+							$entry = ldap_get_entries($this->cnx, $sr);
+                        	//print_r($entry);
+                        	$ldap_users[] = $entry[0][$attrib][0];
+						
+
+						}
+                	}
+                //print_r($ldap_users);die;
 				}
+            	
 				else {
 					foreach($entries[0]['member'] as $k=>$v){
 						$ldap_users[]=ldap_explode_dn($v,1)[0];

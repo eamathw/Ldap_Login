@@ -143,7 +143,7 @@ function sync_get_users($q2a=False){
 	if($q2a == False){
 		$userlist=array();
 		foreach($result as $k=>$v){
-			$userlist[$v['username']] = ($v['id']);
+			$userlist[strtolower($v['username'])] = ($v['id']);
 		};
 	return $userlist;
 	}
@@ -223,7 +223,7 @@ function sync_ldap(){
 		$page['infos'][] = l10n('"%s" users removed:', count($diff));																  
 		foreach($diff as $username => $id){
 			if($id >2){
-				//delete_user($id);
+				delete_user($id);
 				$page['infos'][] = l10n('User "%s" deleted', $username);
 			}
         }
