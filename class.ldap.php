@@ -351,6 +351,10 @@ class Ldap {
 		if($search){
 			$entries = ldap_get_entries($this->cnx,$search); //get group
 			if($entries['count']>0){
+				if(config['ld_membership_user']==0){
+					$this->write_log("[check_ldap_group_membership]> Found user using (&(objectclass=$group_class)(cn=$group_cn)(member=$user_dn)($group_filter))");
+					return true;
+				}
 				$this->write_log("[ldap_get_entries]>". serialize($entries));
 				$memberEntries=$entries[0][strtolower($member_attr)];
 				for($i=0;$i<$memberEntries['count'];$i++){
