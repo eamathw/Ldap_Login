@@ -67,31 +67,36 @@ class Ldap_Login_maintain extends PluginMaintain
 		global $conf;
 		
 		$ldap=new Ldap();
-		$ldap->load_default_config();
 		
-		//prepare sql-table
-		$ldap->write_log("[Maintain.inc.php/Install]> Created SQL-table");
-		ld_sql('create','create_table');
-		$ldap->write_log("[Maintain.inc.php/Install]> Created SQL-data from default values");
-		ld_sql('create','create_data',$ldap->config);
-		
-		//everyone, in old situation (ONCE)
-		if (file_exists(LDAP_LOGIN_PATH .'/data.dat' ) && !file_exists(LDAP_LOGIN_PATH .'/config/data.dat' )) { //only in root not in .config/
-			rename(LDAP_LOGIN_PATH . '/data.dat', LDAP_LOGIN_PATH .'/config/data.dat'); //migrate old location to new
-			$ldap->write_log("[Maintain.inc.php/Install]> Moved data.dat");
+		if(!ld_table_exist()){ //new install or from old situation
+			$ldap->load_default_config();
+			//prepare sql-table
+			$ldap->write_log("[Maintain.inc.php/Install]> Created SQL-table");
+			ld_sql('create','create_table');
+			$ldap->write_log("[Maintain.inc.php/Install]> Created SQL-data from default values");
+			ld_sql('create','create_data',$ldap->config);
+			
+			//everyone, in old situation (ONCE)
+			if (file_exists(LDAP_LOGIN_PATH .'/data.dat' ) && !file_exists(LDAP_LOGIN_PATH .'/config/data.dat' )) { //only in root not in .config/
+				rename(LDAP_LOGIN_PATH . '/data.dat', LDAP_LOGIN_PATH .'/config/data.dat'); //migrate old location to new
+				$ldap->write_log("[Maintain.inc.php/Install]> Moved data.dat");
+			}
+			
+			//future, in new situation (inactivated plugin)
+			if (file_exists(LDAP_LOGIN_PATH .'/config/data.dat' )) { 
+				$ldap->write_log("[Maintain.inc.php/Install]> loading ./config/data.dat ");
+				$ldap->write_log("[Maintain.inc.php/Install]> function load_old_config ");
+				$ldap->load_old_config();; // will overwrite default values
+				unlink( LDAP_LOGIN_PATH .'/config/data.dat'  ); //delete data.dat
+				$ldap->write_log("[Maintain.inc.php/Install]> deleted ./config/data.dat ");
+			}
+			
 		}
-		
-		//future, in new situation.
-		if (file_exists(LDAP_LOGIN_PATH .'/config/data.dat' )) { 
-			$ldap->write_log("[Maintain.inc.php/Install]> loading ./config/data.dat ");
-			$ldap->write_log("[Maintain.inc.php/Install]> function load_old_config ");
-			$ldap->load_old_config();; // will overwrite default values
-			unlink( LDAP_LOGIN_PATH .'/config/data.dat'  ); //delete data.dat
-			$ldap->write_log("[Maintain.inc.php/Install]> deleted ./config/data.dat ");
-		}
-
-		else { //fresh install or no config found 
-			$ldap->write_log("[Maintain.inc.php/Install]> Installing LDAP_login, initializing default data.dat");
+		else { 
+			$ldap->load_default_config();
+			$ldap->write_log("[Maintain.inc.php/Install]> Default config loaded ");
+			$ldap->load_config($merge=True);
+			$ldap->write_log("[Maintain.inc.php/Install]> Merged old config");
 		}
 		$ldap->write_log("[Maintain.inc.php/Install]> Saving config");
 		$ldap->save_config();
@@ -116,11 +121,12 @@ class Ldap_Login_maintain extends PluginMaintain
 	 */
 		$ldap=new Ldap();
 		$ldap->load_default_config();
+		$ldap->load_config($merge=True);
 		$ldap->write_log("[function]> activate");
 		if (!isset($ldap->config['ld_debug_clearupdate']) OR ($ldap->config['ld_debug_clearupdate'] == True))
 		{   
 			$loc = $ldap->check_config('ld_debug_location');
-			//file_put_contents($loc . 'ldap_login.log','');
+			file_put_contents($loc . 'ldap_login.log','');
 			$ldap->write_log("[Maintain.inc.php/Activate]> Ldap_login.log cleared");
 		}
 		
@@ -155,7 +161,7 @@ class Ldap_Login_maintain extends PluginMaintain
 	 * this function is triggered after deactivation, by manual deactivation
 	 * or after a plugin update
 	 *  
-	 * Does nothing but writing in a log
+	 * Does nothing but writing in a log and exporting data
 	 *
 	 * @since ~
 	 *

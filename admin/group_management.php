@@ -143,7 +143,7 @@ function sync_get_users($q2a=False){
 	if($q2a == False){
 		$userlist=array();
 		foreach($result as $k=>$v){
-			$userlist[$v['username']] = ($v['id']);
+			$userlist[strtolower($v['username'])] = ($v['id']);
 		};
 	return $userlist;
 	}
@@ -215,18 +215,25 @@ function sync_ldap(){
 
 	$users = sync_get_users();	
 	global $ldap;
-	$users_ldap=$ldap->getUsers();
-	$diff = array_diff_key($users, array_flip($users_ldap));
-	global $page;
-	$page['infos'][] = l10n('"%s" users removed:', count($diff));																  
-	foreach($diff as $username => $id){
-		if($id >2){
-			delete_user($id);
-			$page['infos'][] = l10n('User "%s" deleted', $username);
-		}
+	$ld_user_attr=$ldap->config['ld_user_attr'];
+	$users_ldap=$ldap->getUsers(null, $ld_user_attr);
+	if($users_ldap){
+		$diff = array_diff_key($users, array_flip($users_ldap));
+		global $page;
+		$page['infos'][] = l10n('"%s" users removed:', count($diff));																  
+		foreach($diff as $username => $id){
+			if($id >2){
+				delete_user($id);
+				$page['infos'][] = l10n('User "%s" deleted', $username);
+			}
+        }
 		
-	}
+    }
+	else {
+    	global $page;
+		$page['errors'][] = l10n('An error occurred, please contact your webmaster or the plugin developer');
 	//delete_user .\piwigo\admin\include\functions.php
+	}
 }
 
  
