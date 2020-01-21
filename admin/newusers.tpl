@@ -28,6 +28,14 @@ label
 	{'Do you allow new piwigo users to be created when users authenticate succesfully on the ldap ?'|@translate}
     </p>
     <p>
+	{if $LD_USE_MAIL}
+		<input type="checkbox" id="ld_use_mail" name="LD_USE_MAIL" value="{$LD_USE_MAIL}" checked />
+	{else}
+		<input type="checkbox" id="ld_use_mail" name="LD_USE_MAIL" value="{$LD_USE_MAIL}" />
+	{/if}
+	{'Import mailadress from LDAP to Piwigo?'|@translate}
+    </p>    
+	<p>
 	{if $LD_ALLOW_PROFILE}
 		<input type="checkbox" id="ld_allow_profile" name="LD_ALLOW_PROFILE" value="{$LD_ALLOW_PROFILE}" checked />
 	{else}

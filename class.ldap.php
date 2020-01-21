@@ -39,6 +39,7 @@ class Ldap {
 		'ld_group_webmaster_active' => 0,
 		'ld_sync_data' => null,
 		'ld_allow_newusers' => 1,
+		'ld_use_mail'=> 1,
 		'ld_allow_profile' => 1,
 		'ld_advertise_admin_new_ldapuser' => 0,
 		'ld_send_password_by_mail_ldap' => 0

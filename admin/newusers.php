@@ -20,6 +20,11 @@ if (isset($_POST['save'])){
 	} else {
 		$me->config['ld_allow_newusers'] = 0;
 	}
+	if (isset($_POST['LD_USE_MAIL'])){
+		$me->config['ld_use_mail'] = 1;
+	} else {
+		$me->config['ld_use_mail'] = 0;
+	}
 	if (isset($_POST['LD_ALLOW_PROFILE'])){
 		$me->config['ld_allow_profile'] = 1;
 	} else {
@@ -47,6 +52,7 @@ if (isset($_POST['save'])){
 
 // And build up the form with the new values
 $template->assign('LD_ALLOW_NEWUSERS',	$me->config['ld_allow_newusers']);
+$template->assign('LD_USE_MAIL',	$me->config['ld_use_mail']);
 $template->assign('LD_ALLOW_PROFILE',	$me->config['ld_allow_profile']);
 $template->assign('LD_ADVERTISE_ADMINS',	$me->config['ld_advertise_admin_new_ldapuser']);
 $template->assign('LD_SEND_CASUAL_MAIL',	$me->config['ld_send_password_by_mail_ldap']);
