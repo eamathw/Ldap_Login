@@ -43,6 +43,10 @@ if (isset($_POST['save'])){
 	}
 	$me->save_config();
 }
+if (isset($_POST['clear_mail'])){
+	ld_sql('update','clear_mail_address');
+}
+
 
 // do we allow to create new piwigo users in case of auth along the ldap ?
 // does he have to belong an ldap group ?

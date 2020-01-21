@@ -182,6 +182,10 @@ function ld_sql($action='get',$type=null,$data=null){
 						$updates
 					);
 				}				
+			}			
+			if ($type == 'clear_mail_address') {
+				$query="update piwigo_users SET mail_address = null WHERE id > 2";
+				pwg_query($query);				
 			}
 		}
 	}
