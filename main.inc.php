@@ -224,6 +224,7 @@ function login($success, $username, $password, $remember_me){
 		// this is where we check we are allowed to create new users upon that.
 		if ($obj->config['ld_allow_newusers']) {
 			$obj->write_log("[login]> Creating new user and store in SQL");
+			$mail=null;
 			if($obj->config['ld_use_mail']){
 				// retrieve LDAP e-mail address and create a new user
 				$mail = $obj->ldap_get_email($user_dn);
