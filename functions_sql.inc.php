@@ -4,20 +4,16 @@ error_reporting(E_ALL);
 ini_set('display_errors',1);
 
 
-function table_exist() {
+function ld_table_exist() {
 /**
  * Checks table in SQL-database Piwigo for plugin ldap_login
- * Depending on $fix it can do for:
  *
- *		table_exist($fix=True) {
- *    	 -  Return an boolean for table existance and creates table if not exists
  *
- *		table_exist($fix=False) {
  *    	 - Return an boolean for table existance 
  *
  * @since 2.10.1
  *
- * @param boolean $fix
+ * 
  * @return boolean 
  */
 	$query = ('select 1 from `piwigo_ldap_login_config` LIMIT 1');
@@ -79,7 +75,7 @@ function ld_sql($action='get',$type=null,$data=null){
 	###
 
 	if ($action === 'get') {
-		if(table_exist()){
+		if(ld_table_exist()){
 			$query ='SELECT param,value FROM piwigo_ldap_login_config';
 			$result = query2array($query,'param','value');
 			return $result;
@@ -89,8 +85,6 @@ function ld_sql($action='get',$type=null,$data=null){
 	###
 	### CREATE 
 	###	ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_general_ci;
-
-		
 	if ($action == 'create'){
 		if ($type == 'create_table') {
 			$query="CREATE TABLE IF NOT EXISTS `piwigo_ldap_login_config` (`param` varchar(40) CHARACTER SET utf8 NOT NULL,`value` text CHARACTER SET utf8,`comment` varchar(255) CHARACTER SET utf8 DEFAULT NULL,UNIQUE KEY `param` (`param`)) ENGINE = MyISAM CHARSET=utf8 COLLATE utf8_general_ci;";
@@ -105,18 +99,22 @@ function ld_sql($action='get',$type=null,$data=null){
 						'value' => pwg_db_real_escape_string($v)
 						);
 				}
-				mass_inserts('piwigo_ldap_login_config', array('param','value'), $datas);
+				mass_inserts('piwigo_ldap_login_config', array('param','value'), $datas,array('ignore'=>true));
 			}
 			
 		}	
-		
+	}
 	###
 	### Update 
 	###	
 	
-	}		
+	//maybe try this in future, but piwigo functions dont support it (yet)
+	//INSERT OR IGNORE INTO book(id) VALUES(1001);
+	//UPDATE book SET name = 'Programming' WHERE id = 1001;	
+
+	
 	if ($action == 'update'){
-		if(table_exist()){
+		if(ld_table_exist()){
 			if ($type == 'reset_openldap') {
 				$updates = array(
 					array(
@@ -195,7 +193,7 @@ function ld_sql($action='get',$type=null,$data=null){
 	###	
 
 	if ($action == 'delete'){
-		if(table_exist()){
+		if(ld_table_exist()){
 			if ($type=='delete_table') {
 				$query="
 				DROP TABLE `piwigo_ldap_login_config`;

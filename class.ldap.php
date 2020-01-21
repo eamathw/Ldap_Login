@@ -114,9 +114,17 @@ class Ldap {
 	
 	
 	
-	function load_config() {
-		$this->write_log("[load_config]> Getting data from SQL table");
-		$this->config=ld_sql('get');
+	function load_config($merge=false) {
+		if(!$merge){
+			$this->write_log("[load_config]> Getting data from SQL table");
+			$this->config=ld_sql('get');
+		}
+		else{ //only in situation where default config has  been loaded (x+n keys) and personal config (x keys) are to be merged
+			$data=ld_sql('get'); //old config (x keys)
+			foreach($data as $key=>$value){ //looping over x keys (thus omitting n keys)
+				$this->config[$key]=$value;	 //setting value
+			}
+		}
 	}
 	function load_old_config() {
 		if (file_exists(LDAP_LOGIN_PATH .'/config/data.dat' )){
