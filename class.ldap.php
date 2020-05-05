@@ -74,6 +74,7 @@ class Ldap {
 
 		// root account test if completed
 		if (!empty($this->config['ld_binddn']) && !empty($this->config['ld_bindpw'])){ // if empty ld_binddn, anonymous search
+		
 			// authentication with rootdn and rootpw for search
 			if (!$this->ldap_bind_as($this->config['ld_binddn'],$this->config['ld_bindpw'])){
 				return $this->getErrorString();
@@ -471,7 +472,8 @@ class Ldap {
 
 	public function ldap_check_basedn(){
 		$this->write_log("[function]> ldap_check_basedn ");
-		if ($read = @ldap_read($this->cnx,$this->config['ld_basedn'],'(objectClass=*)',array('dn'))){
+		if ($read = @ldap_read($this->cnx,$this->config['ld_basedn'],"objectClass=*",array('cn'))){
+
 			$entry = @ldap_get_entries($this->cnx, $read);
 			if (!empty($entry[0]['dn'])) {
 				return true;
