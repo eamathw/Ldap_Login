@@ -80,7 +80,7 @@ function sync_create_group($groups){
 				if ($count != 0)
 				{
 					$err=True;
-					$page['errors'][] = l10n('This name for the group ('. $tmp_group . ') already exist.');
+					$page['errors'][] = l10n('This name for the group (%s) already exist.', $tmp_group);
 				}
 				#delete sync / reverse sync
 			}
