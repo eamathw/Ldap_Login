@@ -74,7 +74,7 @@ function sync_create_group($groups){
 				$query = '
 				SELECT COUNT(*)
 				FROM '.GROUPS_TABLE.'
-				WHERE name = \''.$tmp_group.'\'
+				WHERE name = \''.pwg_db_real_escape_string($tmp_group).'\'
 				;';
 				list($count) = pwg_db_fetch_row(pwg_query($query));
 				if ($count != 0)
