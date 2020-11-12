@@ -215,11 +215,11 @@ function sync_ldap(){
 
 	$users = sync_get_users();	
 	global $ldap;
+	global $page;
 	$ld_user_attr=$ldap->config['ld_user_attr'];
 	$users_ldap=$ldap->getUsers(null, $ld_user_attr);
 	if($users_ldap){
 		$diff = array_diff_key($users, array_flip($users_ldap));
-		global $page;
 		$page['infos'][] = l10n('"%s" users removed:', count($diff));																  
 		foreach($diff as $username => $id){
 			if($id >2){
@@ -230,7 +230,6 @@ function sync_ldap(){
 		
     }
 	else {
-    	global $page;
 		$page['errors'][] = l10n('An error occurred, please contact your webmaster or the plugin developer');
 	//delete_user .\piwigo\admin\include\functions.php
 	}
