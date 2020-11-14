@@ -80,7 +80,7 @@ function sync_create_group($groups){
 				if ($count != 0)
 				{
 					$err=True;
-					$page['errors'][] = l10n('This name for the group ('. $tmp_group . ') already exist.');
+					$page['errors'][] = l10n('This name for the group (%s) already exist.', $tmp_group);
 				}
 				#delete sync / reverse sync
 			}
@@ -242,9 +242,9 @@ function sync_ldap(){
 
 
 // Save LDAP configuration when submitted
-if (isset($_POST['sync_action'])){
+if (isset($_POST['sync_action_submit']) || isset($_POST['sync_action_refresh'])){
 	$ldap->ldap_conn();
-	if($_POST['sync_action'] =='Submit') {
+	if(isset($_POST['sync_action_submit'])) {
 	
 		//activate groups.
 		if(!($ld_sync_data==null)){
@@ -299,7 +299,7 @@ if (isset($_POST['sync_action'])){
 	}
 
 	//Refresh button on page.
-	if ($_POST['sync_action'] =='Refresh'){ 
+	if (isset($_POST['sync_action_refresh'])){
 		$ld_sync_data = $ldap->ldap_get_groups($ldap->config['ld_group_basedn']);
 		$ldap->config['ld_sync_data']=serialize($ld_sync_data);
 		$ldap->save_config();
