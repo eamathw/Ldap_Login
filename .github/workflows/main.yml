@@ -1,0 +1,30 @@
+name: Sync Fork
+on:
+  # push:
+  #  branches:
+  #    - dev
+  # schedule:
+  #   - cron: '0 6 * * 6' # every 30 minutes
+  workflow_dispatch: # on button click
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Prepare environment
+        run: |
+          ./.test/invoke-test.sh
+      - name: Run environment
+        run: |
+          ./.test/invoke-test.sh          
+      - name: Start containers
+        run: docker-compose -f "./.tests/docker-compose.yml" up -d
+
+      - name: Run tests
+        run: | 
+          echo 1
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "./.tests/docker-compose.yml" down          
