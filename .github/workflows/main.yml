@@ -1,4 +1,4 @@
-name: Sync Fork
+name: Testing
 on:
   # push:
   #  branches:
@@ -17,7 +17,7 @@ jobs:
           ./.test/invoke-test.sh
       - name: Run environment
         run: |
-          ./.test/invoke-test.sh          
+          ./.test/invoke-test.sh
       - name: Start containers
         run: docker-compose -f "./.tests/docker-compose.yml" up -d
 
