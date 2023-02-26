@@ -16,21 +16,26 @@ function ld_table_exist() {
  * 
  * @return boolean 
  */
+
 	global $prefixeTable, $conf;
 	$query = "SELECT count(*) as count FROM information_schema.TABLES WHERE (TABLE_SCHEMA = '" . $conf['db_base'] . "') AND (TABLE_NAME = '" . $prefixeTable . "ldap_login_config')";
-	$r = query2array($query);
-	$c = reset($r)['count'];
-	if(($c) == 0)
-	{
-	   //table not found..
- 
-	   return false;
+	error_log('[ld_table_exist] > ' . $query);
+	try {
+		error_log('[ld_table_exist] > Try query on database');
+		$qresult = query2array($query);
+		#$r = pwg_query($query);
+		if (!is_object($qresult)) {
+			$result = false;
+		} else {
+			$result = true;
+		}
+	} catch(mysqli_sql_exception $mes) {
+		error_log('[ld_table_exist] > mysqli_sql_exception caught.');
+		error_log('[ld_table_exist] > ' . $mes);
+		$result = false;
 	}
-	else
-	{
-		return true;
-		//I can find it...or more than one table found..
-	}
+	error_log('[ld_table_exist] > ' . $result);
+	return $result;
 }
 
 
