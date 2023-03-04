@@ -70,7 +70,7 @@ jobs:
           LDAP_USERNAME: admin
         run: |
           cd docker-piwigo
-          docker-compose run piwigo.phpunit ./vendor/bin/phpunit --bootstrap vendor/autoload.php /piwigo/piwigo/plugins/ldap_login/.tests/LdapLogin.php # /app/vendor/bin/phpunit , /piwigo/piwigo/plugins/
+          docker-compose run piwigo.phpunit --bootstrap vendor/autoload.php /piwigo/piwigo/plugins/ldap_login/.tests/LdapLoginTest.php # /app/vendor/bin/phpunit , /piwigo/piwigo/plugins/
           cd ..
 
       - name: Stop containers
