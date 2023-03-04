@@ -5,26 +5,70 @@ on:
   #    - dev
   # schedule:
   #   - cron: '0 6 * * 6' # every 30 minutes
-  workflow_dispatch: # on button click
+  workflow_dispatch:
+    inputs:
+      version_php:
+        description: 'PHP Version'
+        required: true
+        default: '8.1'
+        type: string
+      version_piwigo:
+        description: 'Piwigo Version'
+        required: true
+        default: '13.6'
+        type: string
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    environment: actions-ci
+    env:
+      PASSWORD_DB_ROOT: ${{ secrets.PASSWORD_DB_ROOT }}
+      PASSWORD_PIWIGO_ADMIN: ${{ secrets.PASSWORD_PIWIGO_ADMIN }}
+      PASSWORD_LDAP_ADMIN: ${{ secrets.PASSWORD_LDAP_ADMIN }}
+      PASSWORD_LDAP_CONFIG: ${{ secrets.PASSWORD_LDAP_CONFIG }}
     steps:
+      - name: Set environment variables (workflow)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "VERSION_PHP=${{ inputs.version_php }}" >> $GITHUB_ENV
+          echo "VERSION_PIWIGO=${{ inputs.version_piwigo }}" >> $GITHUB_ENV
+      - name: Set environment variables (environment)
+        if: github.event_name != 'workflow_dispatch' || ( github.event.inputs.version_php == '' &&  github.event.inputs.version_piwigo == '' )
+        run: |
+          echo "VERSION_PHP=${{ vars.VERSION_PHP }}" >> $GITHUB_ENV
+          echo "VERSION_PIWIGO=${{ vars.VERSION_PIWIGO }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
-      - name: Prepare environment
+        with:
+          path: 'ldap_login'
+      - name: Clone docker-piwigo
         run: |
-          ./.test/invoke-test.sh
-      - name: Run environment
+          git clone https://github.com/Kipjr/docker-piwigo docker-piwigo
+      - name: Prepare docker-compose.yml
         run: |
-          ./.test/invoke-test.sh
+          envsubst < docker-piwigo/docker-compose.template > docker-piwigo/docker-compose.yml
+          grep 'image: ghcr.io/kipjr/docker-piwigo:php-apache.*$' docker-piwigo/docker-compose.yml
+      - name: Install phpunit
+        run: |
+          composer require --dev phpunit/phpunit
       - name: Start containers
-        run: docker-compose -f "./.tests/docker-compose.yml" up -d
-
+        run: cd docker-piwigo && docker-compose up -d && cd ..
+      - name: Copy ldap_logon to container:/app/piwigo/plugins
+        run: |
+          docker cp ./ldap_login/ piwigo.php:/app/piwigo/plugins/
+      - name: Install phpunit using composer 
+        run: |
+          docker-compose run piwigo.composer require --dev phpunit/phpunit       
       - name: Run tests
-        run: | 
-          echo 1
+        env:
+          #DATABASE_URL: mysql://ldap_login:password@localhost/ldap_login
+          LDAP_HOST: ldap://ldap
+          LDAP_PORT: 389
+          LDAP_VERSION: 3
+          LDAP_USERNAME: admin
+        run: |
+          docker-compose run piwigo.phpunit vendor/bin/phpunit --bootstrap vendor/autoload.php /piwigo/piwigo/.tests/LdapLogin.php
 
       - name: Stop containers
         if: always()
-        run: docker-compose -f "./.tests/docker-compose.yml" down          
+        run: cd docker-piwigo && docker-compose down
