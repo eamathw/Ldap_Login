@@ -58,7 +58,9 @@ jobs:
           docker cp ./ldap_login/ piwigo.php:/app/piwigo/plugins/
       - name: Install phpunit using composer 
         run: |
-          docker-compose run piwigo.composer require --dev phpunit/phpunit       
+          cd docker-piwigo
+          docker-compose run piwigo.composer require --dev phpunit/phpunit
+          cd ..
       - name: Run tests
         env:
           #DATABASE_URL: mysql://ldap_login:password@localhost/ldap_login
@@ -67,7 +69,9 @@ jobs:
           LDAP_VERSION: 3
           LDAP_USERNAME: admin
         run: |
+          cd docker-piwigo
           docker-compose run piwigo.phpunit vendor/bin/phpunit --bootstrap vendor/autoload.php /piwigo/piwigo/.tests/LdapLogin.php
+          cd ..
 
       - name: Stop containers
         if: always()
