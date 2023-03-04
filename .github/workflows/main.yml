@@ -59,7 +59,7 @@ jobs:
       - name: Install phpunit using composer 
         run: |
           cd docker-piwigo
-          docker-compose run piwigo.composer require --dev phpunit/phpunit
+          docker-compose run piwigo.composer require --dev phpunit/phpunit # composer.json  composer.lock  vendor
           cd ..
       - name: Run tests
         env:
@@ -70,7 +70,7 @@ jobs:
           LDAP_USERNAME: admin
         run: |
           cd docker-piwigo
-          docker-compose run piwigo.phpunit vendor/bin/phpunit --bootstrap vendor/autoload.php /piwigo/piwigo/.tests/LdapLogin.php
+          docker-compose run piwigo.phpunit ./vendor/bin/phpunit --bootstrap vendor/autoload.php /piwigo/piwigo/plugins/ldap_login/.tests/LdapLogin.php # /app/vendor/bin/phpunit , /piwigo/piwigo/plugins/
           cd ..
 
       - name: Stop containers
