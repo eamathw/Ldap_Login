@@ -1,3 +1,8 @@
+<?php
+require_once '/app/vendor/autoload.php';
+include_once('class.ldap.php');
+include_once('functions_sql.inc.php');
+
 class LdapLoginTest extends \PHPUnit\Framework\TestCase {
     private $ldap;
 
@@ -13,11 +18,11 @@ class LdapLoginTest extends \PHPUnit\Framework\TestCase {
         $this->ldap = null;
     }
 
-    public function testConnect() {
+    public function testcheck_ldap() {
         $this->assertTrue($this->ldap->connect());
     }
 
-    public function testBind() {
+    public function testldap_bind_as() {
         $username = 'testuser';
         $password = 'testpass';
 
@@ -34,7 +39,7 @@ class LdapLoginTest extends \PHPUnit\Framework\TestCase {
         $this->assertIsArray($entries);
         $this->assertCount(1, $entries);
         $this->assertArrayHasKey('uid', $entries[0]);
-        $this->assertArrayHasKey('cn', $entries[0]));
+        $this->assertArrayHasKey('cn', $entries[0]);
     }
 
     public function testGetEntry() {
@@ -45,7 +50,7 @@ class LdapLoginTest extends \PHPUnit\Framework\TestCase {
 
         $this->assertIsArray($entry);
         $this->assertArrayHasKey('uid', $entry);
-        $this->assertArrayHasKey('cn', $entry));
+        $this->assertArrayHasKey('cn', $entry);
     }
 
     public function testAuthenticate() {
@@ -55,3 +60,4 @@ class LdapLoginTest extends \PHPUnit\Framework\TestCase {
         $this->assertTrue($this->ldap->authenticate($username, $password));
     }
 }
+?>
