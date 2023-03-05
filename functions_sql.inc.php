@@ -23,8 +23,7 @@ function ld_table_exist() {
 	try {
 		error_log('[ld_table_exist] > Try query on database');
 		$qresult = query2array($query);
-		#$r = pwg_query($query);
-		if (!is_object($qresult)) {
+		if ($qresult[0]['count'] == 0) {
 			$result = false;
 		} else {
 			$result = true;
@@ -34,7 +33,7 @@ function ld_table_exist() {
 		error_log('[ld_table_exist] > ' . $mes);
 		$result = false;
 	}
-	error_log('[ld_table_exist] > ' . $result);
+	error_log('[ld_table_exist] > ' .  ($result ? 'true' : 'false'));
 	return $result;
 }
 
