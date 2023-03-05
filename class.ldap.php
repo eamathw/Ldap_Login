@@ -49,11 +49,17 @@ class Ldap {
 	public function write_log($message,$loglevel='DEBUG',$format="Y:m:d H:i:u"){
 		//[2020-01-01T23:47:52+00:00] DEBUG: New LDAP --> DATE_ATOM
 		//[2020-01-01 23:47:523097] DEBUG: New LDAP --> "Y:m:d H:i:u"
+		$start_index = 0;
+		$end_index = 8000;
 		$ts = date_format(date_create() ,$format);
+		$message = strip_tags($message);
+		$message = substr( $message , $start_index , $end_index ) ;
 		$full = "[" . $ts . "] " . $loglevel . ": " . ($message);
 		if(isset($this->config['ld_debug'])&&$this->config['ld_debug']){
 			file_put_contents($this->check_config('ld_debug_location') . 'ldap_login.log',$full."\n",FILE_APPEND);
 		}
+		error_log( $full );
+		
 	}
 
 	/**
