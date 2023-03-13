@@ -1,15 +1,49 @@
 <?php
 
-class Ldap
-{
-    private $log;
-    private $config;
-    private $connection;
-    private $baseDn;
-    private $bindDn;
-    private $bindPassword;
-    private $userFilter;
-    private $attributes;
+
+global $conf;
+class Ldap {
+	var $cnx;
+	var $config;
+	var $groups = array();
+	var $warn_msg = array();
+	var	$default_val = array(
+		'ld_forgot_url' => 'password.php',
+		'ld_debug_location' =>'./plugins/ldap_login/logs/',
+		'ld_debug' => 1,
+		'ld_debug_clearupdate' => 1,
+		'ld_debug_level' => 'debug',
+		'ld_host' => 'localhost',
+		'ld_port' => '389',
+		'ld_basedn' => 'ou=domain,dc=domain,dc=tld',
+		'ld_user_class' => 'person',
+		'ld_user_attr' => 'samaccountName',
+		'ld_user_filter' => null,
+		'ld_group_class' => 'group',
+		'ld_group_filter' => null,
+		'ld_group_attr' => 'name',
+		'ld_group_desc' => 'description',
+		'ld_group_basedn' => 'cn=groups,ou=domain,dc=domain,dc=tld',
+		'ld_group_member_attr' => 'member',
+		'ld_user_member_attr' => 'memberOf',
+		'ld_group_webmaster' => 'cn=webmasters,cn=groups,ou=domain,dc=domain,dc=tld',
+		'ld_group_admin' => 'cn=admins,cn=groups,ou=domain,dc=domain,dc=tld',
+		'ld_group_user' => 'cn=users,cn=groups,ou=domain,dc=domain,dc=tld',
+		'ld_binddn' => 'cn=service_account, ou=admins, ou=domain, dc=domain,dc=tld',
+		'ld_bindpw' => null,
+		'ld_anonbind' => 0,
+		'ld_use_ssl' => 0,
+		'ld_membership_user' => 0,
+		'ld_group_user_active' => 1,
+		'ld_group_admin_active' => 0,
+		'ld_group_webmaster_active' => 0,
+		'ld_sync_data' => null,
+		'ld_allow_newusers' => 1,
+		'ld_use_mail'=> 1,
+		'ld_allow_profile' => 1,
+		'ld_advertise_admin_new_ldapuser' => 0,
+		'ld_send_password_by_mail_ldap' => 0
+		);
 
     
     public function __construct($host, $port, $baseDn, $bindDn, $bindPassword, $userFilter, $attributes)
