@@ -3,6 +3,14 @@ if (!defined('PHPWG_ROOT_PATH')) die('Hacking attempt!');
 
 global $template, $ld_config, $ld_log;
 $template->set_filenames( array('plugin_admin_content' => dirname(__FILE__).'/configuration.tpl') );
+<<<<<<< HEAD
+=======
+$template->assign(
+  array(
+    'PLUGIN_ACTION' => get_root_url().'admin.php?page=plugin-ldap_login-configuration',
+    'PLUGIN_CHECK' => get_root_url().'admin.php?page=plugin-ldap_login-configuration',
+    ));
+>>>>>>> 02892d2 (Remove Hardcoded Ldap_Login)
 
 $template->assign(
     array(
