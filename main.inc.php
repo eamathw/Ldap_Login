@@ -17,10 +17,6 @@ define('LDAP_LOGIN_ID',      basename(dirname(__FILE__)));
 define('LDAP_LOGIN_PATH' ,   PHPWG_PLUGINS_PATH . LDAP_LOGIN_ID . '/');
 define('LDAP_LOGIN_ADMIN',   get_root_url() . 'admin.php?page=plugin-' . LDAP_LOGIN_ID);
 
-
-# rename(oldname, newname, context)
-# echo strtolower("Hello WORLD.");
-
 include_once(LDAP_LOGIN_PATH.'/class.ldap.php');
 include_once(LDAP_LOGIN_PATH.'/functions_sql.inc.php');
 
