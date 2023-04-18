@@ -45,7 +45,25 @@ class Ldap {
 		'ld_send_password_by_mail_ldap' => 0
 		);
 
+	public function clear_log(){
+		if(str_starts_with($this->check_config('ld_debug_location') , "/")) {
+			# absolute
+			if(is_writable($this->check_config('ld_debug_location') . 'ldap_login.log')){
+				file_put_contents($this->check_config('ld_debug_location') . 'ldap_login.log','');
+			} else {
+				error_log("Unable to clear " . $this->check_config('ld_debug_location') . 'ldap_login.log');
+			}
+		} else {
+			# relative (nothing or ./logs/)
+			if(is_writable(LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log')){
+				file_put_contents( LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log','');
+			} else {
+				error_log("Unable to clear " . LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log');
+			}
 
+		}	
+	}
+	
 	public function write_log($message,$loglevel='DEBUG',$format="Y:m:d H:i:u"){
 		//[2020-01-01T23:47:52+00:00] DEBUG: New LDAP --> DATE_ATOM
 		//[2020-01-01 23:47:523097] DEBUG: New LDAP --> "Y:m:d H:i:u"
