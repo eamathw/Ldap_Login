@@ -125,8 +125,7 @@ class Ldap_Login_maintain extends PluginMaintain
 		$ldap->write_log("[function]> activate");
 		if (!isset($ldap->config['ld_debug_clearupdate']) OR ($ldap->config['ld_debug_clearupdate'] == True))
 		{   
-			$loc = $ldap->check_config('ld_debug_location');
-			file_put_contents($loc . 'ldap_login.log','');
+			$ldap->clear_log();
 			$ldap->write_log("[Maintain.inc.php/Activate]> Ldap_login.log cleared");
 		}
 		
