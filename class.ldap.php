@@ -50,6 +50,7 @@ class Ldap {
 			# absolute
 			if(is_writable($this->check_config('ld_debug_location') . 'ldap_login.log')){
 				file_put_contents($this->check_config('ld_debug_location') . 'ldap_login.log','');
+				error_log("Cleared " . $this->check_config('ld_debug_location') . 'ldap_login.log');
 			} else {
 				error_log("Unable to clear " . $this->check_config('ld_debug_location') . 'ldap_login.log');
 			}
@@ -57,6 +58,7 @@ class Ldap {
 			# relative (nothing or ./logs/)
 			if(is_writable(LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log')){
 				file_put_contents( LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log','');
+				error_log("Cleared " .LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log');
 			} else {
 				error_log("Unable to clear " . LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log');
 			}
@@ -79,14 +81,14 @@ class Ldap {
 				if(is_writable($this->check_config('ld_debug_location') . 'ldap_login.log')){
 					file_put_contents($this->check_config('ld_debug_location') . 'ldap_login.log',$full."\n",FILE_APPEND);
 				} else {
-					error_log("Unable to write to " . $this->check_config('ld_debug_location') . 'ldap_login.log');
+					error_log("Unable to write to absolute path" . $this->check_config('ld_debug_location') . 'ldap_login.log');
 				}
 			} else {
 				# relative (nothing or ./logs/)
 				if(is_writable(LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log')){
 					file_put_contents( LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log',$full."\n",FILE_APPEND);
 				} else {
-					error_log("Unable to write to " . LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log');
+					error_log("Unable to write to relative path " . LDAP_LOGIN_PATH . 'logs/' . 'ldap_login.log');
 				}
 
 			}

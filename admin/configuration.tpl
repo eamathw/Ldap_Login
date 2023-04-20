@@ -26,7 +26,7 @@
 	<label style="display:inline-block; width:15%;" style="display:inline-block; width:120px; text-align:right;" for="ld_debug_location"><span>{'Log location'|@translate}</span></label>
 	<input size="70" type="text" id="ld_debug_location" name="LD_DEBUG_LOCATION" value="{$LD_DEBUG_LOCATION}"/>
 	{if isset($WARN_LD_DEBUG_LOCATION) and $WARN_LD_DEBUG_LOCATION}<i style="color:red;">{$WARN_LD_DEBUG_LOCATION}</i>{/if}<br>
-	<i style="margin:15%;">Field to define the location of debug.log. Protect the location with .htaccess or store in /var/log/ (most secure)</i><br>
+	<i style="margin:15%;">Field to define the location of debug.log. Protect the location with .htaccess or store in absolute paths like /var/log/ (most secure). Relative paths always resolve to to ./logs/ldap_login.log</i><br>
 	</p>
 	<p>
 	<label style="display:inline-block; width:15%;" for="ld_debug">
