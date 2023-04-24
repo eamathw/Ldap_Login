@@ -1,33 +1,26 @@
 <?php
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license.
 
-// <UseSnippet>
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Http;
 use Microsoft\Graph\Model;
 use GuzzleHttp\Client;
-// </UseSnippet>
 
 class GraphHelper {
-    // <UserAuthConfigSnippet>
+    
     private static Client $tokenClient;
     private static string $clientId = '';
     private static string $tenantId = '';
     private static string $graphUserScopes = '';
     private static Graph $userClient;
     private static string $userToken;
-
+    
     public static function initializeGraphForUserAuth(): void {
         GraphHelper::$tokenClient = new Client();
         GraphHelper::$clientId = $_ENV['CLIENT_ID'];
         GraphHelper::$tenantId = $_ENV['TENANT_ID'];
         GraphHelper::$graphUserScopes = $_ENV['GRAPH_USER_SCOPES'];
         GraphHelper::$userClient = new Graph();
-    }
-    // </UserAuthConfigSnippet>
-
-    // <GetUserTokenSnippet>
+    }  
     public static function getUserToken(): string {
         // If we already have a user token, just return it
         // Tokens are valid for one hour, after that it needs to be refreshed
@@ -93,25 +86,34 @@ class GraphHelper {
             }
         }
     }
-    // </GetUserTokenSnippet>
-
-    // <GetUserSnippet>
     public static function getUser(): Model\User {
         $token = GraphHelper::getUserToken();
         GraphHelper::$userClient->setAccessToken($token);
 
         return GraphHelper::$userClient->createRequest('GET', '/me?$select=displayName,mail,userPrincipalName')
-                                       ->setReturnType(Model\User::class)
-                                       ->execute();
-    }
-    // </GetUserSnippet>
+                                    ->setReturnType(Model\User::class)
+                                    ->execute();
+    }    
+    public static function getInbox(): Http\GraphCollectionRequest {
+        $token = GraphHelper::getUserToken();
+        GraphHelper::$userClient->setAccessToken($token);
 
-    // <MakeGraphCallSnippet>
+        // Only request specific properties
+        $select = '$select=from,isRead,receivedDateTime,subject';
+        // Sort by received time, newest first
+        $orderBy = '$orderBy=receivedDateTime DESC';
+
+        $requestUrl = '/me/mailFolders/inbox/messages?'.$select.'&'.$orderBy;
+        return GraphHelper::$userClient->createCollectionRequest('GET', $requestUrl)
+                                    ->setReturnType(Model\Message::class)
+                                    ->setPageSize(25);
+    }
     public static function makeGraphCall(): void {
         $token = GraphHelper::getUserToken();
         GraphHelper::$userClient->setAccessToken($token);
         // INSERT YOUR CODE HERE
-    }
-    // </MakeGraphCallSnippet>
-}
+    }        
+}      
+
+
 ?>
