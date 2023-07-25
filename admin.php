@@ -12,7 +12,7 @@ $page['tab'] = (isset($_GET['tab'])) ? $_GET['tab'] : $page['tab'] = 'configurat
 // tabsheet
 include_once(PHPWG_ROOT_PATH.'admin/include/tabsheet.class.php');
 $tabsheet = new tabsheet();
-$tabsheet->set_id('ldap_login');
+$tabsheet->set_id(LDAP_LOGIN_ID);
 
 $tabsheet->add('configuration', l10n('Configuration'), LDAP_LOGIN_ADMIN . '-configuration');
 $tabsheet->add('newusers', l10n('New user management'), LDAP_LOGIN_ADMIN . '-newusers');
