@@ -12,7 +12,9 @@
 {footer_script require="jquery"}
 {/footer_script}
 
-
+<div class="titrePage">
+	<h2>{'Ldap_Login Plugin'|@translate}</h2>
+</div>
 
 <div id="configContent">
     {if $LD_AUTH_TYPE=='ld_auth_ldap'}

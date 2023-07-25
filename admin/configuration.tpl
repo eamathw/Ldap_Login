@@ -93,7 +93,9 @@
 {/footer_script}
 
 
-<h2>{'ldap_login Plugin'|@translate}</h2>
+<div class="titrePage">
+	<h2>{'Ldap_Login Plugin'|@translate}</h2>
+</div>
 
 <div id="configContent">
 <form method="post" action="{$PLUGIN_ACTION}" class="general">
