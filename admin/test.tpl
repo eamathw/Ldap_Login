@@ -52,15 +52,15 @@
         <div class="container">
             <div class="card">
                 <div class="card-body">
-                    <center>{if isset($JWT_CONTENT)}<a href="{{$OAUTH_URL}}">{else}{/if}<img
+                    <center>{if isset($OAUTH_URL)}<a href="{{$OAUTH_URL}}">{else}{/if}<img
                                 src="https://learn.microsoft.com/en-us/azure/active-directory/develop/media/howto-add-branding-in-apps/ms-symbollockup_signin_dark.png"></a>
                     </center>
                     {if isset($JWT_CONTENT)}
                         <hr>
-                        <h2>id_token</h2>
+                        <h3>id_token</h3>
                         <pre>{print_r($JWT_CONTENT['id_token'],true)}</pre>
                         <hr>
-                        <h2>access_token</h2>
+                        <h3>access_token</h3>
                         <pre>{print_r($JWT_CONTENT['access_token'],true)}</pre>
                         </p>
                     {/if}
