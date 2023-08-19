@@ -497,7 +497,7 @@ function LDAP_login($success, $username, $password, $remember_me){
                 $new_id = register_user($username,random_password(),$mail,true,$errors);
                 if(count($errors) > 0) {
                     foreach ($errors as &$e){
-                        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ".$e, 'ERROR');
+                        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ".$e);
                     }
                     return false;
                 }
