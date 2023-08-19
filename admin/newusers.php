@@ -41,7 +41,7 @@ if (isset($_POST['save'])){
     } else {
         $ld_config->setValue('ld_send_password_by_mail_ldap',0);
     }
-    $ld_config->save_config();
+    $ld_config->saveConfig();
 }
 if (isset($_POST['clear_mail'])){
     ld_sql('update','clear_mail_address');
