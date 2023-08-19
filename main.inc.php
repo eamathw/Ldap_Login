@@ -430,6 +430,7 @@ function LDAP_login($success, $username, $password, $remember_me){
                 $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ". $group_query);
                 $pwg_status = pwg_db_fetch_assoc(pwg_query($group_query))['status']; //current status according to Piwigo
                 $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> info: $username, Current status:$pwg_status");
+                $status = Null;
                 
                 //enable upgrade / downgrade from administrator
                 if (($ld_config->getValue('ld_group_admin_active')==True) && ($ld_ldap->isUserMemberOfGroup($user_dn, $ld_config->getValue('ld_group_admin')))) {
