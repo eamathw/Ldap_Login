@@ -426,7 +426,7 @@ function LDAP_login($success, $username, $password, $remember_me){
             if ($ld_config->getValue('ld_group_webmaster_active') || $ld_config->getValue('ld_group_admin_active')) {
                 //check admin status
                 $uid = pwg_db_real_escape_string($row['id']);
-                $group_query = 'SELECT user_id, status FROM piwigo_user_infos  WHERE `piwigo_user_infos`.`user_id` = ' . $uid . ';';
+                $group_query = 'SELECT user_id, status FROM '.USER_INFOS_TABLE.'  WHERE `user_id` = ' . $uid . ';';
                 $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ". $group_query);
                 $pwg_status = pwg_db_fetch_assoc(pwg_query($group_query))['status']; //current status according to Piwigo
                 $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> info: $username, Current status:$pwg_status");
@@ -466,7 +466,7 @@ function LDAP_login($success, $username, $password, $remember_me){
                     $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Target status $status");
                     if ($status!=$pwg_status) {
                         $query = '
-                            UPDATE `piwigo_user_infos` SET `status` = "'. $status . '" WHERE `piwigo_user_infos`.`user_id` = ' . $uid . ';';
+                            UPDATE `'.USER_INFOS_TABLE.'` SET `status` = "'. $status . '" WHERE `user_id` = ' . $uid . ';';
                         pwg_query($query);
                         $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Changed $username with id " . $row['id'] . " from ".$pwg_status. " to " . $status);
                         include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
