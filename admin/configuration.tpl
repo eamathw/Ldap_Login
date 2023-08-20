@@ -565,6 +565,19 @@
 
                                     <div class="form-inline mb-3">
                                         <div class="form-group row">
+                                            <label for="ld_user_filter" class="col-sm-2 col-form-label">{'Email Attribute:'|@translate}</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="ld_user_mail_attr"
+                                                name="LD_USER_MAIL_ATTR" value="{$LD_USER_MAIL_ATTR}" placeholder=""
+                                                aria-label="{'User Object Filter:'|@translate}">
+                                                    <small id="ld_user_mail_attr_help" class="text-muted">
+                                                    {'The attribute field to use for the email. Example: mail'|@translate}
+                                                    </small>
+                                            </div>
+                                        </div>
+                                    </div>                                     
+                                    <div class="form-inline mb-3">
+                                        <div class="form-group row">
                                             <label for="ld_user_filter" class="col-sm-2 col-form-label">{'User Object Filter:'|@translate}</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" onchange="updateExampleFilter()" id="ld_user_filter"
@@ -575,8 +588,7 @@
                                                     </small>
                                             </div>
                                         </div>
-                                    </div>                                     
-                                    
+                                    </div>                                        
                                 
                                 </div>
                             </div>

@@ -25,6 +25,7 @@ class Config {
         'ld_group_basedn' => 'cn=groups,ou=domain,dc=domain,dc=tld',
         'ld_group_member_attr' => 'member',
         'ld_user_member_attr' => 'memberOf',
+        'ld_user_mail_attr' => 'mail',
         'ld_group_webmaster' => 'cn=piwigo_webmasters,cn=groups,ou=domain,dc=domain,dc=tld',
         'ld_group_admin' => 'cn=piwigo_admins,cn=groups,ou=domain,dc=domain,dc=tld',
         'ld_group_user' => 'cn=piwigo_users,cn=groups,ou=domain,dc=domain,dc=tld',

@@ -490,8 +490,8 @@ function LDAP_login($success, $username, $password, $remember_me){
                 $mail=null;
                 if($ld_config->getValue('ld_use_mail')){
                     // retrieve LDAP e-mail address and create a new user
-                    $mail = $ld_ldap->getAttribute($user_dn,array('mail'));
-                    $mail = array_shift( $mail );
+                    $mail = $ld_ldap->getAttribute($user_dn,array($ld_config->getValue('ld_user_mail_attr')));
+                    $mail = array_shift( $mail )[0];
                 }
                 $errors=[];
                 $new_id = register_user($username,random_password(),$mail,true,$errors);
