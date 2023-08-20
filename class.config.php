@@ -61,7 +61,7 @@ class Config {
     public function __construct(){
         global $ld_log;
         $this->log=$ld_log;
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> initialized Config Class");
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> initialized Config Class");
 
     }
 
@@ -130,7 +130,7 @@ class Config {
         foreach($this->default_val as $key=>$value){
             $this->config[$key]=$value;    
         }
-        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> load_default_config");
+        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> load_default_config");
     }
     
     
@@ -142,7 +142,7 @@ class Config {
      */    
     function loadConfig($merge=false) {
         if(!$merge){
-            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Getting data from SQL table");
+            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Getting data from SQL table");
             $this->config=ld_sql('get'); // get x keys
         }
         else{ 
@@ -165,7 +165,7 @@ class Config {
             if ($conf_file!==false)
             {
                 $this->config = unserialize($conf_file);
-                $this->log->info("[".basename(__FILE__)."/".__FUNCTION__."]> Getting data from ./config/data.dat");
+                $this->log->info("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Getting data from ./config/data.dat");
             } 
         }    
     }
@@ -178,7 +178,7 @@ class Config {
     function saveConfig()
     {    
         
-        $this->log->info("[".basename(__FILE__)."/".__FUNCTION__."]> Saving values in SQL table");
+        $this->log->info("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Saving values in SQL table");
         ld_sql('update','update_value',$this->config);
         
     }
@@ -192,7 +192,7 @@ class Config {
         $file = fopen( LDAP_LOGIN_PATH.'/config/data.dat', 'w' );
         fwrite($file, serialize($this->config) );
         fclose( $file );
-        $this->log->info("[".basename(__FILE__)."/".__FUNCTION__."]> Saving values in config/data.dat");
+        $this->log->info("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Saving values in config/data.dat");
         
     }
 }

@@ -106,7 +106,7 @@ function ld_init(){
     $ld_log = new MLogger('Ldap_Login');
     #$ld_log->setFormatter(new LineFormatter(null, null, false, true));
     #$ld_log->pushHandler(new \Monolog\Handler\NullHandler());
-    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> initialized Logger");
+    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> initialized Logger");
     
     $ld_config = new Config();
     $ld_config->loadConfig();	
@@ -141,7 +141,7 @@ function ld_init(){
     }
     if(!pwg_get_session_var('oauth2_state')){
         $stateValue= random_password(64,$limited=true);
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Set state in session: $stateValue");
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Set state in session: $stateValue");
         pwg_set_session_var('oauth2_state',$stateValue );
     };
 
@@ -198,7 +198,7 @@ function ld_redirect_login(){
     if($ld_config->getValue('ld_auth_type')=="ld_auth_azure"){
         
         $state = pwg_get_session_var('oauth2_state');
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Get state from session to build Login URI: $state");
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Get state from session to build Login URI: $state");
         $auth_base = str_replace("{TENANT_ID}",$ld_config->getValue('ld_azure_tenant_id'),$ld_config->getValue('ld_azure_auth_url'));
         $form_params = array(
             'response_type' => 'code',
@@ -230,21 +230,21 @@ function OAuth2_login($userResource,$userIdentifier){
     global $ld_log,$ld_config;
     
     if($ld_config->getValue('ld_auth_type')=="ld_auth_azure"){
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> New login session: ld_auth_azure");
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> New login session: ld_auth_azure");
         
         
         global $prefixeTable,$conf;
         // search user in piwigo database based on username & additional search on email
         
         $row = array('id' => (get_userid($userResource['data'][$userIdentifier]) ? get_userid($userResource['data'][$userIdentifier]) : get_userid_by_email($userResource['data']['mail'])));
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> IdByName:".get_userid($userResource['data'][$userIdentifier]) . " IdByEmail: " .   get_userid_by_email($userResource['data']['mail']) );
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> IdByName:".get_userid($userResource['data'][$userIdentifier]) . " IdByEmail: " .   get_userid_by_email($userResource['data']['mail']) );
         
         #Azure: identifier can be userPrincipalName , mail
         
         #$query = 'SELECT '.$conf['user_fields']['id'].' AS id FROM '.USERS_TABLE.' WHERE '.$conf['user_fields']['username'].' = \''.pwg_db_real_escape_string($userResource['data'][$userIdentifier]).'\' OR '.$conf['user_fields']['email'].' = \''.pwg_db_real_escape_string($userResource['data']['mail']).'\' ;';
         #$row = pwg_db_fetch_assoc(pwg_query($query));
-        #$ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> username found in db:" . (!empty($row1['id'])) . " mail found in db: " . (!empty($row['id'])));
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> id found in db:" . $row['id']);
+        #$ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> username found in db:" . (!empty($row1['id'])) . " mail found in db: " . (!empty($row['id'])));
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> id found in db:" . $row['id']);
         // if query is not empty, it means everything is ok and we can continue, auth is done !
         if ($row['id'] != false) {
         #if($id) {
@@ -271,17 +271,17 @@ function OAuth2_login($userResource,$userIdentifier){
             if($status == false){
                 //if remote user_group is active but user is not found in any group, fail login 
                 trigger_notify('login_failure', stripslashes($userResource['data'][$userIdentifier]));
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> User does not have role / claim as user to login");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> User does not have role / claim as user to login");
                 return false;
             }
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Update username in db based on return values of OAuth2 with userIdentifier: ". $userIdentifier);
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Update username in db based on return values of OAuth2 with userIdentifier: ". $userIdentifier);
             $query = 'UPDATE `'.USERS_TABLE.'` SET `username` =  \''.pwg_db_real_escape_string($userResource['data'][$userIdentifier]).'\' WHERE `'.USERS_TABLE.'`.`id` = ' . $row['id'] . ';';
             pwg_query($query);
             
             $query = 'UPDATE `'.USER_INFOS_TABLE.'` SET `status` = "'. $status . '" WHERE `'.USER_INFOS_TABLE.'`.`user_id` = ' . $row['id'] . ';';
             pwg_query($query); 
             
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Login Success. Returning to index");
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Login Success. Returning to index");
             pwg_unset_session_var("oauth2_state");
             
             log_user($row['id'], false);
@@ -290,10 +290,10 @@ function OAuth2_login($userResource,$userIdentifier){
 
         } else {
         //user doest not (yet) exist
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> User found in Azure but not in SQL");
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> User found in Azure but not in SQL");
             //this is where we check we are allowed to create new users upon that.
             if ($ld_config->getValue('ld_allow_newusers')) {
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Creating new user and store in SQL");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Creating new user and store in SQL");
                 $mail=null;
                 if($ld_config->getValue('ld_use_mail')){
                     //retrieve LDAP e-mail address and create a new user
@@ -303,7 +303,7 @@ function OAuth2_login($userResource,$userIdentifier){
                 $new_id = register_user($userResource['data'][$userIdentifier],random_password(32), $mail ,true,$errors);
                 if(count($errors) > 0) {
                     foreach ($errors as &$e){
-                        $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__."]> ".$e );
+                        $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ".$e );
                     }
                     return false;
                 }
@@ -323,7 +323,7 @@ function OAuth2_login($userResource,$userIdentifier){
                 }
                 if($status == false){
                     trigger_notify('login_failure', stripslashes($userResource['data'][$userIdentifier]));
-                    $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__."]> User does not have role / claim as user to login");
+                    $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> User does not have role / claim as user to login");
                     return false;
                 }                              
                 $query = 'UPDATE `'.USER_INFOS_TABLE.'` SET `status` = "'. $status . '" WHERE `'.USER_INFOS_TABLE.'`.`user_id` = ' . $new_id . ';';
@@ -345,7 +345,7 @@ function OAuth2_login($userResource,$userIdentifier){
             //else : this is the normal behavior ! user is not created.
             else {
                 trigger_notify('login_failure', stripslashes($userResource['data'][$userIdentifier]));
-                $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__."]> Not allowed to create user (ld_allow_newusers=false)");
+                $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Not allowed to create user (ld_allow_newusers=false)");
                 return false;
             }
         }        
@@ -390,7 +390,7 @@ function LDAP_login($success, $username, $password, $remember_me){
     global $ld_log,$ld_config;
     
     if($ld_config->getValue('ld_auth_type')=="ld_auth_ldap"){
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> New login session: ld_auth_ldap");
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> New login session: ld_auth_ldap");
         $ld_use_ssl=$ld_config->getValue('ld_use_ssl');
         $ldap_host=$ld_config->getValue('ld_host');
         $base_dn=$ld_config->getValue('ld_basedn');
@@ -400,7 +400,7 @@ function LDAP_login($success, $username, $password, $remember_me){
         $user_filter = '(&(&(objectClass='.$ld_config->getValue('ld_user_class').')('.$ld_config->getValue('ld_user_attr').'=%username%))('.$ld_config->getValue('ld_user_filter',True).'))';
         
         $host = "ldap" . ($ld_use_ssl==1 ? "s" : "") . "://". $ldap_host;
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> new Ldap($host,$port,$base_dn,$binddn,bindpw,$user_filter,array('dn')");
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> new Ldap($host,$port,$base_dn,$binddn,bindpw,$user_filter,array('dn')");
         $ld_ldap = new Ldap($host,$port,$base_dn,$binddn,$bindpw,$user_filter,array('dn'));
         if($ld_ldap == False){
             return False;
@@ -410,26 +410,26 @@ function LDAP_login($success, $username, $password, $remember_me){
         // If we have userdn, attempt to login an check user's group access via LDAP
             if(!($ld_ldap->isUserMemberOfGroup($user_dn, $ld_config->getValue('ld_group_user')))) {
                 trigger_notify('login_failure', stripslashes($username));
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> wrong u/p or no group access");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> wrong u/p or no group access");
                 return False; // wrong user/password or no group access
             }
         }
 
         // search user in piwigo database
         $query = 'SELECT '.$conf['user_fields']['id'].' AS id FROM '.USERS_TABLE.' WHERE '.$conf['user_fields']['username'].' = \''.pwg_db_real_escape_string($username).'\' ;';
-        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ". $query);
+        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". $query);
         $row = pwg_db_fetch_assoc(pwg_query($query));
 
         // if query is not empty, it means everything is ok and we can continue, auth is done !
         if (!empty($row['id'])) {
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ". $row['id']);
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". $row['id']);
             if ($ld_config->getValue('ld_group_webmaster_active') || $ld_config->getValue('ld_group_admin_active')) {
                 //check admin status
                 $uid = pwg_db_real_escape_string($row['id']);
                 $group_query = 'SELECT user_id, status FROM '.USER_INFOS_TABLE.'  WHERE `user_id` = ' . $uid . ';';
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ". $group_query);
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". $group_query);
                 $pwg_status = pwg_db_fetch_assoc(pwg_query($group_query))['status']; //current status according to Piwigo
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> info: $username, Current status:$pwg_status");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> info: $username, Current status:$pwg_status");
                 $status = Null;
                 
                 //enable upgrade / downgrade from administrator
@@ -447,7 +447,7 @@ function LDAP_login($success, $username, $password, $remember_me){
                     $status = "normal";
                 }
                 
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Admin_active:" . $ld_config->getValue('ld_group_admin_active') ." WebmasterActive:" . $ld_config->getValue('ld_group_webmaster_active') . "Current: $status");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Admin_active:" . $ld_config->getValue('ld_group_admin_active') ." WebmasterActive:" . $ld_config->getValue('ld_group_webmaster_active') . "Current: $status");
                 if (is_null($status)) {}//user is not a webmaster / admin or functionality disabled
                 
                 elseif($status == "admin") {
@@ -463,30 +463,29 @@ function LDAP_login($success, $username, $password, $remember_me){
                 elseif($status == "normal"){} // always downgrade to normal if status was set
                 
                 if(isset($status)){
-                    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Target status $status");
+                    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Target status $status");
                     if ($status!=$pwg_status) {
                         $query = '
                             UPDATE `'.USER_INFOS_TABLE.'` SET `status` = "'. $status . '" WHERE `user_id` = ' . $uid . ';';
                         pwg_query($query);
-                        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Changed $username with id " . $row['id'] . " from ".$pwg_status. " to " . $status);
+                        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Changed $username with id " . $row['id'] . " from ".$pwg_status. " to " . $status);
                         include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
                         invalidate_user_cache();
                     }
                 }
-            }
-            
+            }         
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> User " . $username . " found in SQL DB and login success");
             log_user($row['id'], $remember_me);
             trigger_notify('login_success', stripslashes($username));
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> User " . $username . " found in SQL DB and login success");
             return true;
         }
         
         // if query is empty but ldap auth is done we can create a piwigo user if it's said so !
         else {
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> User found in LDAP but not in SQL");
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> User found in LDAP but not in SQL");
             // this is where we check we are allowed to create new users upon that.
             if ($ld_config->getValue('ld_allow_newusers')) {
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Creating new user and store in SQL");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Creating new user and store in SQL");
                 $mail=null;
                 if($ld_config->getValue('ld_use_mail')){
                     // retrieve LDAP e-mail address and create a new user
@@ -497,7 +496,7 @@ function LDAP_login($success, $username, $password, $remember_me){
                 $new_id = register_user($username,random_password(),$mail,true,$errors);
                 if(count($errors) > 0) {
                     foreach ($errors as &$e){
-                        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ".$e);
+                        $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ".$e);
                     }
                     return false;
                 }
@@ -517,7 +516,7 @@ function LDAP_login($success, $username, $password, $remember_me){
             // else : this is the normal behavior ! user is not created.
             else {
                 trigger_notify('login_failure', stripslashes($username));
-                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Not allowed to create user (ld_allow_newusers=false)");
+                $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Not allowed to create user (ld_allow_newusers=false)");
                 return false;
             }
         }

@@ -15,7 +15,7 @@ function Callback(){
     define('REDIRECT_URI', $ld_config->getValue('ld_azure_redirect_uri'));
     
     $jwks_url = str_replace("{TENANT_ID}",TENANT_ID,$ld_config->getValue('ld_azure_jwks_url'));
-    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Initializing OAuth2 login");
+    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Initializing OAuth2 login");
     $client = new Client();
     $token_url = str_replace("{TENANT_ID}",TENANT_ID,$ld_config->getValue('ld_azure_token_url'));
     try{
@@ -49,7 +49,7 @@ function Callback(){
             $decodedIdToken = JWT::decode($idToken, JWK::parseKeySet($azureKeys,'RS256')); //works
             $userResource['claim']=$decodedIdToken->{$ld_config->getValue('ld_azure_claim_name')} ?? array();
         } catch (\Exception $e) {
-            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Exception catched:" . $e->getMessage() );
+            $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Exception catched:" . $e->getMessage() );
         }
         
         // currently unable to decode access token
@@ -84,7 +84,7 @@ function Callback(){
         pwg_set_session_var('jwt_data_test',$jwt_data );
         
         //echo("<pre>");print_r($userResource);
-		$ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Oauth2_login(Array,$userIdentifier)");
+		$ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Oauth2_login(Array,$userIdentifier)");
         Oauth2_login($userResource,$userIdentifier);
         
     } else if (preg_match('/^4[0-9]+/', $tokenResponse->getStatusCode())){
@@ -95,7 +95,7 @@ function Callback(){
             $error_description = $responseBody->error_description;
             // authorization_pending means we should keep polling
             if (strcmp($error, 'authorization_pending') != 0) {
-                $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__."]>Token endpoint returned: " . $error . " " . $error_description);
+                $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]>Token endpoint returned: " . $error . " " . $error_description);
                 return false;
             }
         }
@@ -105,9 +105,9 @@ function Callback(){
 if (isset($_GET['code']) && isset($_GET['state'])) {
     global $ld_config,$ld_log;
     $state = pwg_get_session_var('oauth2_state');
-    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> State of Session: $state , ". $_GET['state']);
+    $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> State of Session: $state , ". $_GET['state']);
     if ($_GET['state'] != $state) {
-        $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__."]> invalid state");
+        $ld_log->error("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> invalid state");
         return false;
     }
     return Callback();
