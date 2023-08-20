@@ -20,14 +20,22 @@ $template->assign(
 if (isset($_POST['check_ldap']) ){
     $ld_log->debug("[function]> Ldap_Login Test");
     if($ld_config->getValue('ld_anonbind') == 0){
+
         $ld_ldap=new ldap();
-        $result = $ld_ldap->authenticate($_POST['USERNAME'], $_POST['PASSWORD'],$test = True);
-        if($result->bindSuccess == True && $result->credentialsCorrect == True) {
+        $isAuthenticated = $ld_ldap->authenticate($_POST['USERNAME'], $_POST['PASSWORD']); # not really required here.
+        $result = $ld_ldap->getDebugData();
+
+        $row = array('id' => (get_userid($_POST['USERNAME']) ? get_userid($_POST['USERNAME']) : get_userid_by_email($_POST['USERNAME'])));
+        if ($row['id'] != false && $result->userFound == True) {
+            //user exist
+        }
+        
+        if($result->bindSuccess == True && $result->userObject->credentialsCorrect == True) {
             $statusMessage = '<p style="color:green;">Configuration LDAP OK:<pre>' . json_encode($result, JSON_PRETTY_PRINT) . '</pre></p>';
-        } elseif($result->credentialsCorrect == False) {
-            $statusMessage = '<p style="color:orange;">Binding OK, but there are errors: '. $result->lastError . '<br><pre>' . json_encode($result, JSON_PRETTY_PRINT) . '</pre></p>';
+        } elseif($result->userObject->credentialsCorrect == False) {
+            $statusMessage = '<p style="color:orange;">Binding OK, but there are errors: '. $result->lastError->message . '<br><pre>' . json_encode($result, JSON_PRETTY_PRINT) . '</pre></p>';
         } else {
-            $statusMessage = '<p style="color:red;">Error :'.$result->lastError . '<br><pre>' . json_encode($result, JSON_PRETTY_PRINT) . '</pre></p>';
+            $statusMessage = '<p style="color:red;">Error :'.$result->lastError->message . '<br><pre>' . json_encode($result, JSON_PRETTY_PRINT) . '</pre></p>';
         }
         $template->assign('LD_CHECK_LDAP',$statusMessage);
         #$username = $ld_ldap->ldap_search_dn($_POST['USERNAME']);
