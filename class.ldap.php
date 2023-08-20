@@ -17,29 +17,41 @@ class Ldap
         
         $this->attributes =  array("cn","dn","email","samaccountname","memberOf","member"); 
         $this->userAttribute =  $ld_config->getValue('ld_user_attr');
+        $this->groupMemberAttribute =  $ld_config->getValue('ld_group_member_attr');
+        $this->groupObjectClass =  $ld_config->getValue('ld_group_class');
         $this->userClass =  $ld_config->getValue('ld_user_class');
         $this->userFilter =  $ld_config->getValue('ld_user_filter');
+        $this->ldapGroups = array();
+        if($ld_config->getValue('ld_group_user_active') ==  1      ) {  $this->ldapGroups = array_merge($this->ldapGroups,array("user"      => $ld_config->getValue('ld_group_user'))); }
+        if($ld_config->getValue('ld_group_admin_active') == 1      ) {  $this->ldapGroups = array_merge($this->ldapGroups,array("admin"     => $ld_config->getValue('ld_group_admin'))); }
+        if($ld_config->getValue('ld_group_webmaster_active') == 1  ) {  $this->ldapGroups = array_merge($this->ldapGroups,array("webmaster" => $ld_config->getValue('ld_group_webmaster'))); }
+        
         $this->resultObject = new stdClass();
-        $this->resultObject->lastError="";
+        $this->resultObject->lastError=new stdClass();
+        $this->resultObject->userObject=new stdClass();
         
         if(!extension_loaded('ldap')){
-            $this->log->critical("[".basename(__FILE__)."/".__FUNCTION__."]> LDAP extension not loaded, see php_ldap module.");
+            $this->log->critical("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> LDAP extension not loaded, see php_ldap module.");
             $this->resultObject->extensionLoaded=False;
         }
         $this->resultObject->extensionLoaded=True;
         
         $ld_log->debug("New LDAP Instance");
         $this->connect();
-        $this->bind();
+    }
+    
+    public function getDebugData()
+    {
+        return  $this->resultObject;
     }
     
     private function connect()
     {
-        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ldap_connect($this->host, $this->port)");
+        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ldap_connect($this->host, $this->port)");
         $this->connection = @ldap_connect($this->host, $this->port) or throw new Exception();
         if(!$this->connection)
         {
-            $this->log->critical("[".basename(__FILE__)."/".__FUNCTION__."]> Could not connect to LDAP server.");
+            $this->log->critical("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Could not connect to LDAP server.");
             $this->resultObject->connectedToLdap=False;
         } else {
             $this->resultObject->connectedToLdap=True;
@@ -55,61 +67,66 @@ class Ldap
 
     private function bind()
     {
+        $this->resultObject->anonymousBindSuccess=False;
+        if(ldap_bind($this->connection) && $this->ldap_check_basedn()){
+                $this->resultObject->anonymousBindSuccess=True;
+        }
         if (!ldap_bind($this->connection, $this->bindDn, $this->bindPassword)) {
-            $this->log->critical("[".basename(__FILE__)."/".__FUNCTION__."]> Could not bind to LDAP server.");
+            $this->log->critical("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Could not bind to LDAP server.");
             $this->resultObject->bindSuccess=False;
             return false;
         } else {
-            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Connected to LDAP server.");
+            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Connected to LDAP server.");
             $this->resultObject->bindSuccess=True;
             return true;
         }
     }
     
     
-    public function authenticate($username, $password,$test=False)
+    public function authenticate($username, $password)
     {
+        $this->bind();
+              
         $userDn = $this->getUserDn($username);
 
         if (!$userDn) {
-            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> User $username not found");
-            $this->resultObject->credentialsCorrect=false;
+            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> User $username not found");
+            $this->resultObject->userObject->credentialsCorrect=false;
             $this->resultObject->result=false;
-        }
-        if (@ldap_bind($this->connection, $userDn, $password)) {
-            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> $username can login");
-            $this->resultObject->credentialsCorrect=true;
+        } elseif (@ldap_bind($this->connection, $userDn, $password)) {
+            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> $username can login");
+            $this->resultObject->userObject->credentialsCorrect=true;
+            foreach ($this->ldapGroups as $k => $group) {
+                $this->resultObject->userObject->{$k}=$this->isUserMemberOfGroup($userDn,$group);
+            }
             $this->resultObject->result=true;
         } else {
-            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ". $this->getLdapError() );
-            $this->resultObject->credentialsCorrect=false;
+            $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". $this->getLdapError() );
+            $this->resultObject->userObject->credentialsCorrect=false;
             $this->resultObject->result=false;
         }
-        if($test == True) {
-            return $this->resultObject;
-        } else{
-            return $this->resultObject->result;
-        }
+        return $this->resultObject->result;
+        
     }
 
     public function getUserDn($username)
     {
         $userFilter = $this->getUserFilter($username);
-        $searchResult = ldap_search($this->connection, $this->baseDn, $userFilter, array('dn','cn'));
-        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> ldap_search(connection, ". $this->baseDn .", " . $userFilter . ", array('dn','cn'))");
+        $searchResult = ldap_search($this->connection, $this->baseDn, $userFilter, array('cn','dn'));
+        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ldap_search(connection, ". $this->baseDn .", " . $userFilter . ", array('dn','cn'))");
 
         if($searchResult == false){
-            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__."]> " . $username ." : " . getLdapError());
-            $this->resultObject->userFound=False;
+            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> " . $username ." : " . $this->getLdapError());
+            $this->resultObject->userObject->userFound=False;
             return false;
         }
         $entries = ldap_get_entries($this->connection, $searchResult);
-        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> Found:" . ($entries['count']));
+        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> Found:" . ($entries['count']));
         if ($entries['count'] !== 1) {
-            $this->resultObject->userFound=False;
+            $this->resultObject->userObject->userFound=False;
             return false;
         }
-        $this->resultObject->userFound=True;
+        $this->resultObject->userObject->userFound=True;
         return $entries[0]['dn'];
     }
 
@@ -117,14 +134,32 @@ class Ldap
     {
         $userFilter = empty($this->userFilter) ? "cn=*" : $this->userFilter;
         $filter = '(&(&(objectClass='. $this->userClass.')('.$this->userAttribute.'=%username%))('.$userFilter.'))';
-        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__."]> " . str_replace('%username%', $username, $filter));
+        $this->log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> " . str_replace('%username%', $username, $filter));
         return str_replace('%username%', $username, $filter);
     }
     
-    public function isUserMemberOfGroup($user_dn, $group_dn) {
-        $groupInfo = @ldap_read($this->connection, $group_dn, "(member=$user_dn)");
+    public function isUserMemberOfGroup($userDn, $groupDn) {
+        $groupCn = ldap_explode_dn($groupDn,1)[0];
+/*         $search_filter = "(&(objectclass=$group_class)(cn=$group_cn)($member_attr=$userDn)($group_filter))"; 
+        $search = ldap_search($this->connection, $base_dn, $search_filter,array($member_attr),0,0,5); //search for group
+        if($search){
+			$entries = ldap_get_entries($this->connection,$search); //get group
+            if($entries['count']>0){
+                $memberEntries=$entries[0][strtolower($member_attr)];
+                for($i=0;$i<$memberEntries['count'];$i++){
+                    $memberEntry_dn = $memberEntries[$i];
+                    if($memberEntry_dn === $userDn){ // Match the user.
+                        return true;
+                    }
+                    unset $memberEntry_dn;
+                }
+            }
+        } */
+        //openldap
+        $filter = "($this->groupMemberAttribute=$userDn)";
+        $groupInfo = @ldap_read($this->connection,$groupDn,$filter,array('cn'),0,0,5); // No Such Object
         if($groupInfo == false){
-            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__."]> ". getLdapError() );
+            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". "ldap_read(conn,$groupDn,$filter,array('cn'),0,0,5): " . $this->getLdapError() );
             return false;
         }
         $entries = ldap_get_entries($this->connection, $groupInfo);
@@ -135,7 +170,7 @@ class Ldap
     public function getAttribute($user_dn,array $attr){
 		$searchResult=@ldap_read($this->connection, $user_dn, "(objectclass=*)",$attr);
         if($searchResult == false){
-            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__."]> ". getLdapError() );
+            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". $this->getLdapError() );
             return false;
         }
 		$entries = @ldap_get_entries($this->connection, $searchResult);
@@ -144,11 +179,27 @@ class Ldap
         }
         return $entries[0];
 	}
-    
+	public function ldap_check_basedn(){
+		if ($read = @ldap_read($this->connection,$this->baseDn,"objectClass=*",array('cn'))){
+			$entry = @ldap_get_entries($this->connection, $read);
+			if (!empty($entry[0]['dn'])) {
+				return true;
+			}
+            $this->log->warning("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> ". $this->getLdapError() );
+		}
+		return false;
+	}
     public function getLdapError(){
         $err = ldap_err2str(ldap_errno($this->connection));
-        $this->resultObject->lastError=$err;
+        $this->resultObject->lastError->message=$err;
+        $this->resultObject->lastError->diagnostic=$this->getLdapDiagnostic();
         return $err;
     }
+    public function getLdapDiagnostic(){
+        if (ldap_get_option($this->connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error)) {
+            return $extended_error;
+        }
+    }
+
 }
 ?>
