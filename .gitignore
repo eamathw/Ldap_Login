@@ -43,3 +43,4 @@ Thumbs.db
 
 !logs/ldap_login.log
 vendor/
+*.bak
