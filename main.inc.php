@@ -222,11 +222,16 @@ function ld_redirect_login(){
  *
  * @since ~13.7
  *
+ * @param boolean $success
  * @param array $userResource
  * @param string $userIdentifier 
  * @return boolean
  */
-function OAuth2_login($userResource,$userIdentifier){
+function OAuth2_login($success,$userResource,$userIdentifier){
+    if ($success===true)
+    {
+      return true;
+    }
     global $ld_log,$ld_config;
     
     if($ld_config->getValue('ld_auth_type')=="ld_auth_azure"){
@@ -380,6 +385,10 @@ function OAuth2_login($userResource,$userIdentifier){
  * @return boolean
  */
 function LDAP_login($success, $username, $password, $remember_me){
+    if ($success===true)
+    {
+      return true;
+    }
     //force users to lowercase name, or else duplicates will be made, like user,User,uSer etc.
     $username=strtolower($username); // should be replaced by $conf['insensitive_case_logon']
     global $conf;
