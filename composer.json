@@ -1,8 +1,11 @@
 {
     "name": "kipjr/ldap_login",
     "description": "Ldap_Login for Piwigo",
-    "keywords": ["Piwigo", "Ldap_login"],
-    "license":"Apache-2.0",
+    "keywords": [
+        "Piwigo",
+        "Ldap_login"
+    ],
+    "license": "Apache-2.0",
     "type": "project",
     "minimum-stability": "stable",
     "require": {
