@@ -9,6 +9,10 @@ jobs:
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v2
+                
+            -   name: Code style check
+                uses: TheDragonCode/codestyler@v3
+                if: ${{ github.ref == 'refs/remotes/pull' }}
 
             -   name: Code style fix
                 uses: TheDragonCode/codestyler@v3
