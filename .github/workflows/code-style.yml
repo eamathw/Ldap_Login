@@ -12,7 +12,8 @@ jobs:
                 
             -   name: Code style check
                 uses: TheDragonCode/codestyler@v3
-                if: ${{ github.ref == 'refs/remotes/pull' }}
+                if: ${{ github.ref == 'refs/remotes/pull/*' }}
+                
 
             -   name: Code style fix
                 uses: TheDragonCode/codestyler@v3
