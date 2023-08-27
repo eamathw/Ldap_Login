@@ -3,6 +3,7 @@
 if (! defined('PHPWG_ROOT_PATH')) {
     exit('Hacking attempt!');
 }
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Level;
 use Monolog\Logger as MLogger;
@@ -68,10 +69,11 @@ class Ldap_Login_maintain extends PluginMaintain
         global $prefixeTable;
 
         $ld_log = new MLogger(LDAP_LOGIN_ID);
-        $ld_log->setFormatter(new LineFormatter(null, null, false, true));
-        $handler = [];
-        array_push($handler, new ErrorLogHandler(level: Level::Debug)); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
-        $ld_log->setHandlers($handler);
+        $handlerArray = [];
+        $handler =  new ErrorLogHandler(level: Level::Debug);
+        $handler->setFormatter(new LineFormatter(null, null, false, true));
+        array_push($handlerArray,$handler); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
+        $ld_log->setHandlers($handlerArray);
 
         $ld_config = new Config();
 
@@ -130,10 +132,11 @@ class Ldap_Login_maintain extends PluginMaintain
          */
         global $ld_config,$ld_log;
         $ld_log = new MLogger(LDAP_LOGIN_ID);
-        $ld_log->setFormatter(new LineFormatter(null, null, false, true));
-        $handler = [];
-        array_push($handler, new ErrorLogHandler(level: Level::Debug)); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
-        $ld_log->setHandlers($handler);
+        $handlerArray = [];
+        $handler = new ErrorLogHandler(level: Level::Debug);
+        $handler->setFormatter(new LineFormatter(null, null, false, true));
+        array_push($handlerArray, ); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
+        $ld_log->setHandlers($handlerArray);
         $ld_config = new Config();
 
         $ld_config->loadDefaultConfig();
@@ -193,10 +196,11 @@ class Ldap_Login_maintain extends PluginMaintain
 
         global $ld_config,$ld_log;
         $ld_log = new MLogger(LDAP_LOGIN_ID);
-        $ld_log->setFormatter(new LineFormatter(null, null, false, true));
-        $handler = [];
-        array_push($handler, new ErrorLogHandler(level: Level::Debug)); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
-        $ld_log->setHandlers($handler);
+        $handlerArray = [];
+        $handler = new ErrorLogHandler(level: Level::Debug);
+        $handler->setFormatter(new LineFormatter(null, null, false, true));
+        array_push($handlerArray, $handler); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
+        $ld_log->setHandlers($handlerArray);
         $ld_config = new Config();
         $ld_log->warning('[' . basename(__FILE__) . '/' . __FUNCTION__ . "]> Check value of 'allow_user_registration' as no user is currently able to register.");
         $ld_log->info('[' . basename(__FILE__) . '/' . __FUNCTION__ . ']> deactivated');
