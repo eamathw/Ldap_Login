@@ -68,11 +68,11 @@ class Ldap_Login_maintain extends PluginMaintain
          */
         global $prefixeTable;
 
-        $ld_log = new MLogger(LDAP_LOGIN_ID);
+        $ld_log       = new MLogger(LDAP_LOGIN_ID);
         $handlerArray = [];
-        $handler =  new ErrorLogHandler(level: Level::Debug);
+        $handler      = new ErrorLogHandler(level: Level::Debug);
         $handler->setFormatter(new LineFormatter(null, null, false, true));
-        array_push($handlerArray,$handler); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
+        array_push($handlerArray, $handler); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
         $ld_log->setHandlers($handlerArray);
 
         $ld_config = new Config();
@@ -131,11 +131,11 @@ class Ldap_Login_maintain extends PluginMaintain
          *
          */
         global $ld_config,$ld_log;
-        $ld_log = new MLogger(LDAP_LOGIN_ID);
+        $ld_log       = new MLogger(LDAP_LOGIN_ID);
         $handlerArray = [];
-        $handler = new ErrorLogHandler(level: Level::Debug);
+        $handler      = new ErrorLogHandler(level: Level::Debug);
         $handler->setFormatter(new LineFormatter(null, null, false, true));
-        array_push($handlerArray, ); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
+        array_push($handlerArray); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
         $ld_log->setHandlers($handlerArray);
         $ld_config = new Config();
 
@@ -195,9 +195,9 @@ class Ldap_Login_maintain extends PluginMaintain
          */
 
         global $ld_config,$ld_log;
-        $ld_log = new MLogger(LDAP_LOGIN_ID);
+        $ld_log       = new MLogger(LDAP_LOGIN_ID);
         $handlerArray = [];
-        $handler = new ErrorLogHandler(level: Level::Debug);
+        $handler      = new ErrorLogHandler(level: Level::Debug);
         $handler->setFormatter(new LineFormatter(null, null, false, true));
         array_push($handlerArray, $handler); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
         $ld_log->setHandlers($handlerArray);

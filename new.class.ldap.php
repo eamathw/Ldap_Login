@@ -39,7 +39,7 @@ class Ldap
             return false;
         }
 
-        return (bool) (ldap_bind($this->connection, $userDn, $password));
+        return (bool) ldap_bind($this->connection, $userDn, $password);
     }
 
     public function getUserDn($username)
