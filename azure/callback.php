@@ -91,7 +91,7 @@ function Callback()
         pwg_set_session_var('jwt_data', $jwt_data);
 
         $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Oauth2_login(false,Array,$userIdentifier)");
-        Oauth2_login(false,$userResource, $userIdentifier);
+        Oauth2_login(false, $userResource, $userIdentifier);
     }
     elseif (preg_match('/^4[0-9]+/', $tokenResponse->getStatusCode())) {
         // Check the error in the response body
@@ -100,6 +100,7 @@ function Callback()
         if (isset($responseBody->error)) {
             $error             = $responseBody->error;
             $error_description = $responseBody->error_description;
+
             // authorization_pending means we should keep polling
             if (strcmp($error, 'authorization_pending') != 0) {
                 $ld_log->error('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']>Token endpoint returned: ' . $error . ' ' . $error_description);

@@ -186,11 +186,12 @@ function ld_redirect_identification()
     global $ld_config,$ld_log;
 
     if ($ld_config->getValue('ld_auth_type') == 'ld_auth_azure') {
-        if ($_SERVER['REQUEST_METHOD'] === 'GET'){
-            if( isset($_GET['type']) &&  ($_GET['type'] == 'local') ){
-            // do nothing
-            } else {
-                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Redirecting to login");
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            if (isset($_GET['type']) && ($_GET['type'] == 'local')) {
+                // do nothing
+            }
+            else {
+                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Redirecting to login');
                 redirect('index.php');
             }
         }
@@ -251,18 +252,20 @@ function OAuth2_login($success, $userResource, $userIdentifier)
         global $prefixeTable,$conf;
         // search user in piwigo database based on username & additional search on email
 
-        if(preg_match('/identification.php\?type=local/i', $_SERVER['HTTP_REFERER'])){
+        if (preg_match('/identification.php\?type=local/i', $_SERVER['HTTP_REFERER'])) {
             add_event_handler('try_log_user', 'pwg_login', 0, 4);
             $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Overriding login page by' . $username);
-            if(pwg_login($false,$username, $password,$false)){
+
+            if (pwg_login($false, $username, $password, $false)) {
                 redirect(get_gallery_home_url());
+
                 return true;
-            } else {
-                trigger_notify('login_failure', stripslashes($username));
-                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> wrong username / password');
-                return false;
             }
-        } else {
+            trigger_notify('login_failure', stripslashes($username));
+            $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> wrong username / password');
+
+            return false;
+        }
 
         $row = ['id' => (get_userid($userResource['data'][$userIdentifier]) ? get_userid($userResource['data'][$userIdentifier]) : get_userid_by_email($userResource['data']['mail']))];
         $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> IdByName:' . get_userid($userResource['data'][$userIdentifier]) . ' IdByEmail: ' . get_userid_by_email($userResource['data']['mail']));
@@ -273,6 +276,7 @@ function OAuth2_login($success, $userResource, $userIdentifier)
         // $row = pwg_db_fetch_assoc(pwg_query($query));
         // $ld_log->debug("[".basename(__FILE__)."/".__FUNCTION__.":".__LINE__."]> username found in db:" . (!empty($row1['id'])) . " mail found in db: " . (!empty($row['id'])));
         $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> id found in db:' . $row['id']);
+
         // if query is not empty, it means everything is ok and we can continue, auth is done !
         if ($row['id'] != false) {
             // if($id) {
@@ -325,6 +329,7 @@ function OAuth2_login($success, $userResource, $userIdentifier)
         else {
             // user doest not (yet) exist
             $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User found in Azure but not in SQL');
+
             // this is where we check we are allowed to create new users upon that.
             if ($ld_config->getValue('ld_allow_newusers')) {
                 $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Creating new user and store in SQL');
@@ -395,7 +400,6 @@ function OAuth2_login($success, $userResource, $userIdentifier)
 
             return false;
         }
-    }
     }
     unset($ld_config,$ld_log);
 }
@@ -492,6 +496,7 @@ function LDAP_login($success, $username, $password, $remember_me)
                     // is user admin?
                     $status = 'admin'; // according to LDAP
                 }
+
                 // enable upgrade / downgrade from webmaster
                 if (($ld_config->getValue('ld_group_webmaster_active') == true) && $ld_ldap->isUserMemberOfGroup($user_dn, $ld_config->getValue('ld_group_webmaster'))) {
                     // is user webmaster?
@@ -557,6 +562,7 @@ function LDAP_login($success, $username, $password, $remember_me)
         // if query is empty but ldap auth is done we can create a piwigo user if it's said so !
 
         $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User found in LDAP but not in SQL');
+
         // this is where we check we are allowed to create new users upon that.
         if ($ld_config->getValue('ld_allow_newusers')) {
             $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Creating new user and store in SQL');

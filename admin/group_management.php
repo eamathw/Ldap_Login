@@ -64,6 +64,7 @@ function sync_create_group($groups)
         if ($value != false) {
             $tmp_group = $key;
             $err       = false;
+
             // from group_list.php:
             if (empty($tmp_group)) {
                 $err              = true;

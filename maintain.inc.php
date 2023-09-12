@@ -145,6 +145,7 @@ class Ldap_Login_maintain extends PluginMaintain
 
         if (($ld_config->getValue('ld_debug_clearupdate') == 1) or ($ld_config->getValue('ld_debug_clearupdate') == true)) {
             $full = "\n";
+
             // relative (./logs/ldap_login.log)
             if (is_writable(LDAP_LOGIN_PATH . 'logs/ldap_login.log')) {
                 file_put_contents(LDAP_LOGIN_PATH . 'logs/ldap_login.log', $full . "\n");
