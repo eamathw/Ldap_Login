@@ -88,11 +88,10 @@ function Callback()
         ];
 
         pwg_set_session_var('userResource', $userResource);
-        pwg_set_session_var('jwt_data_test', $jwt_data);
+        pwg_set_session_var('jwt_data', $jwt_data);
 
-        // echo("<pre>");print_r($userResource);
-        $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Oauth2_login(Array,$userIdentifier)");
-        Oauth2_login($userResource, $userIdentifier);
+        $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Oauth2_login(false,Array,$userIdentifier)");
+        Oauth2_login(false,$userResource, $userIdentifier);
     }
     elseif (preg_match('/^4[0-9]+/', $tokenResponse->getStatusCode())) {
         // Check the error in the response body

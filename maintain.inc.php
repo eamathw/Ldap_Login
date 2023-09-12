@@ -66,7 +66,7 @@ class Ldap_Login_maintain extends PluginMaintain
          * @since ~
          *
          */
-        global $prefixeTable;
+        global $prefixeTable,$ld_log;
 
         $ld_log       = new MLogger(LDAP_LOGIN_ID);
         $handlerArray = [];
