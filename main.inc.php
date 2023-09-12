@@ -45,7 +45,7 @@ add_event_handler('blockmanager_apply', 'ld_forgot');
 
 add_event_handler('try_log_user', 'LDAP_login', 0, 4);
 
-add_event_handler('try_log_user', 'OAuth2_login', 0, 4);
+// add_event_handler('try_log_user', 'OAuth2_login', 0, 4);
 
 add_event_handler('load_profile_in_template', 'ld_profile');
 
@@ -183,10 +183,17 @@ function ld_forgot()
  */
 function ld_redirect_identification()
 {
-    global $ld_config;
+    global $ld_config,$ld_log;
 
     if ($ld_config->getValue('ld_auth_type') == 'ld_auth_azure') {
-        redirect('index.php');
+        if ($_SERVER['REQUEST_METHOD'] === 'GET'){
+            if( isset($_GET['type']) &&  ($_GET['type'] == 'local') ){
+            // do nothing
+            } else {
+                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Redirecting to login");
+                redirect('index.php');
+            }
+        }
     }
 }
 
@@ -244,6 +251,19 @@ function OAuth2_login($success, $userResource, $userIdentifier)
         global $prefixeTable,$conf;
         // search user in piwigo database based on username & additional search on email
 
+        if(preg_match('/identification.php\?type=local/i', $_SERVER['HTTP_REFERER'])){
+            add_event_handler('try_log_user', 'pwg_login', 0, 4);
+            $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Overriding login page by' . $username);
+            if(pwg_login($false,$username, $password,$false)){
+                redirect(get_gallery_home_url());
+                return true;
+            } else {
+                trigger_notify('login_failure', stripslashes($username));
+                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> wrong username / password');
+                return false;
+            }
+        } else {
+
         $row = ['id' => (get_userid($userResource['data'][$userIdentifier]) ? get_userid($userResource['data'][$userIdentifier]) : get_userid_by_email($userResource['data']['mail']))];
         $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> IdByName:' . get_userid($userResource['data'][$userIdentifier]) . ' IdByEmail: ' . get_userid_by_email($userResource['data']['mail']));
 
@@ -284,7 +304,7 @@ function OAuth2_login($success, $userResource, $userIdentifier)
             if ($status == false) {
                 // if remote user_group is active but user is not found in any group, fail login
                 trigger_notify('login_failure', stripslashes($userResource['data'][$userIdentifier]));
-                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User does not have role / claim as user to login');
+                $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User does not have role / claim as user to login:' . print_r($userResource['claim']));
 
                 return false;
             }
@@ -346,7 +366,7 @@ function OAuth2_login($success, $userResource, $userIdentifier)
 
                 if ($status == false) {
                     trigger_notify('login_failure', stripslashes($userResource['data'][$userIdentifier]));
-                    $ld_log->error('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User does not have role / claim as user to login');
+                    $ld_log->error('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User does not have role / claim as user to login:' . print_r($userResource['claim']));
 
                     return false;
                 }
@@ -375,6 +395,7 @@ function OAuth2_login($success, $userResource, $userIdentifier)
 
             return false;
         }
+    }
     }
     unset($ld_config,$ld_log);
 }
