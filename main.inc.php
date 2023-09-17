@@ -139,6 +139,7 @@ function ld_init()
     }
     elseif ($ld_config->getValue('ld_auth_type') == 'ld_auth_azure') {
         include_once LDAP_LOGIN_PATH . '/azure/callback.php';
+        include_once LDAP_LOGIN_PATH . '/azure/device-auth.php';
     }
 
     if (is_a_guest()) {
