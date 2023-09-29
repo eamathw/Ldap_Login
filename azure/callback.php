@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('PHPWG_ROOT_PATH')) {
+if (! defined('PHPWG_ROOT_PATH')) {
     exit('Hacking attempt!');
 }
 
@@ -13,23 +13,23 @@ function AccessTokenRequest($token_url, $options, $headers)
 {
     try {
         $client = new Client([
-            'timeout' => 1000
+            'timeout' => 1000,
         ]);
-        $request = new Request('POST', $token_url, $headers);
+        $request       = new Request('POST', $token_url, $headers);
         $tokenResponse = $client->sendAsync($request, $options)->wait();
-    } catch (GuzzleHttp\Exception\ClientException $e) {
+    }
+    catch (GuzzleHttp\Exception\ClientException $e) {
         $tokenResponse = $e->getResponse();
     }
+
     return $tokenResponse;
 }
-
-
 
 function Callback($options)
 {
     global $ld_config, $ld_log;
     $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Initializing OAuth2 login');
-    $token_url = str_replace('{TENANT_ID}', TENANT_ID, $ld_config->getValue('ld_azure_token_url'));
+    $token_url     = str_replace('{TENANT_ID}', TENANT_ID, $ld_config->getValue('ld_azure_token_url'));
     $tokenResponse = AccessTokenRequest($token_url, $options, $headers = []);
 
     if ($tokenResponse->getStatusCode() == 200) {
@@ -44,7 +44,8 @@ function Callback($options)
             $azureKeys             = json_decode(file_get_contents($jwks_url), true);
             $decodedIdToken        = JWT::decode($idToken, JWK::parseKeySet($azureKeys, 'RS256')); // works
             $userResource['claim'] = $decodedIdToken->{$ld_config->getValue('ld_azure_claim_name')} ?? [];
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Exception catched:' . $e->getMessage());
         }
 
@@ -81,7 +82,8 @@ function Callback($options)
 
         $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Oauth2_login(false,Array,$userIdentifier)");
         Oauth2_login(false, $userResource, $userIdentifier);
-    } elseif (preg_match('/^4[0-9]+/', $tokenResponse->getStatusCode())) {
+    }
+    elseif (preg_match('/^4[0-9]+/', $tokenResponse->getStatusCode())) {
         // Check the error in the response body
         $responseBody = json_decode($tokenResponse->getBody()->getContents());
 
@@ -99,20 +101,20 @@ function Callback($options)
     }
 }
 
-
 global $ld_config, $ld_log;
 define('TENANT_ID', $ld_config->getValue('ld_azure_tenant_id'));
 define('CLIENT_ID', $ld_config->getValue('ld_azure_client_id'));
 define('CLIENT_SECRET', $ld_config->getValue('ld_azure_client_secret'));
 define('REDIRECT_URI', $ld_config->getValue('ld_azure_redirect_uri'));
-    
-if(isset( $_GET['code'], $_GET['state'])){
+
+if (isset($_GET['code'], $_GET['state'])) {
     $state = pwg_get_session_var('oauth2_state');
-    $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> User Authorization Flow");
+    $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> User Authorization Flow');
     $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> State of Session: $state , " . $_GET['state']);
 
     if ($_GET['state'] != $state) {
         $ld_log->error('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> invalid state');
+
         return false;
     }
     $options = [
@@ -128,20 +130,23 @@ if(isset( $_GET['code'], $_GET['state'])){
         'http_errors' => true,
         'curl'        => [
             CURLOPT_FAILONERROR => false,
-        ]
+        ],
     ];
+
     return Callback($options);
-} elseif(isset($_GET['device_code'])){
-    $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . "]> Device Authorization Flow");
+}
+
+if (isset($_GET['device_code'])) {
+    $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Device Authorization Flow');
     $options = [
         'form_params' => [
             'grant_type' => 'urn:ietf:params:oauth:grant-type:device_code',
-            'code' =>  pwg_get_session_var('device_code'),
-            'client_id' => CLIENT_ID
-        ]
+            'code'       => pwg_get_session_var('device_code'),
+            'client_id'  => CLIENT_ID,
+        ],
     ];
+
     return Callback($options);
-} else {
-    return false;
 }
 
+return false;

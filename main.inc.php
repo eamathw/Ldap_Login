@@ -252,8 +252,9 @@ function OAuth2_login($success, $userResource, $userIdentifier)
 
         global $prefixeTable,$conf;
         // search user in piwigo database based on username & additional search on email
-        $subject = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';  // Fix for 'Undefined array key "HTTP_REFERER" in /app/piwigo/plugins/Ldap_Login/main.inc.php' & 'preg_match(): Passing null to parameter #2 ($subject) of type string is deprecated in /app/piwigo/plugins/Ldap_Login/main.inc.php'
-        if(preg_match('/identification.php\?type=local/i', $subject)){
+        $subject = $_SERVER['HTTP_REFERER'] ?? '';  // Fix for 'Undefined array key "HTTP_REFERER" in /app/piwigo/plugins/Ldap_Login/main.inc.php' & 'preg_match(): Passing null to parameter #2 ($subject) of type string is deprecated in /app/piwigo/plugins/Ldap_Login/main.inc.php'
+
+        if (preg_match('/identification.php\?type=local/i', $subject)) {
             add_event_handler('try_log_user', 'pwg_login', 0, 4);
             $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> Overriding login page by' . $username);
 
