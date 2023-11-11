@@ -218,15 +218,10 @@ class Ldap_Login_maintain extends PluginMaintain
          *
          * @since ~
          */
-        $ld_log = new MLogger(LDAP_LOGIN_ID);
-        $ld_log->setFormatter(new LineFormatter(null, null, false, true));
-        $ld_log->pushHandler(new ErrorLogHandler(level: Level::Debug)); // To php_error.log | NOTICE: PHP message: [2023-05-31T19:39:38.832666+00:00] Ldap_Login.DEBUG
-        $ld_config = new Config();
-        $ld_log->info('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> uninstall');
+        error_log('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> uninstall') ;
         ld_sql('delete', 'delete_table');
-        $ld_log->debug('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> removed piwigo_ldap_login_config table');
-        $ld_log->info('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> plugin uninstalled');
-        unset($ld_config, $ld_log);
+        error_log('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> removed piwigo_ldap_login_config table');
+        error_log('[' . basename(__FILE__) . '/' . __FUNCTION__ . ':' . __LINE__ . ']> plugin uninstalled');
     }
 
     public function __destruct()
