@@ -84,11 +84,8 @@
 	</p>
 	<p>
 	<label style="display:inline-block; width:15%;" for="ld_use_ssl">
-	{if isset($LD_USE_SSL) }
-		<input type="checkbox" id="ld_use_ssl" name="LD_USE_SSL" value="{$LD_USE_SSL}" checked />
-	{else}
-		<input type="checkbox" id="ld_use_ssl" name="LD_USE_SSL" value="{$LD_USE_SSL}" />
-	{/if}
+        <input type='hidden' value='0' name='LD_USE_SSL'>
+        <input type="checkbox" id="ld_use_ssl" name="LD_USE_SSL" value="1" {if $LD_USE_SSL== 1}checked{/if}>
 	{'Secure connexion'|@translate}</label>
 	{if isset($WARN_LD_USE_SSL) and $WARN_LD_USE_SSL}<i style="color:red;">{$WARN_LD_USE_SSL}</i>{/if}<br><br>
 	</p>
