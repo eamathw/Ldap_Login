@@ -1,4 +1,0 @@
-File automatically created from SVN or Git repository.
-
-URL: https://github.com/VSLCatena/ldap_login 
-Revision: ce8c20d1f5ff807868d5320e01a1f34189a84db1 (Wed Sep 19 12:37:31 2018 +0200)
