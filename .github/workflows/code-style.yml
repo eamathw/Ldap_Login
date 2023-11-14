@@ -1,6 +1,9 @@
 name: Code Style
 
-on: [ push, pull_request ]
+on: 
+  #push:
+  #pull_request:
+  workflow_dispatch:
 
 jobs:
     fix:
@@ -17,7 +20,7 @@ jobs:
 
             -   name: Code style fix
                 uses: TheDragonCode/codestyler@v3
-                if: ${{ github.ref == 'refs/heads/dev' }}
+                if: ${{ github.ref == 'refs/heads/dev' || github.event_name == 'workflow_dispatch' }}
                 with:
                     # This token uses GitHub Actions to execute code.
                     # Required when `fix` is `true`.
