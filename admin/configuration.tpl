@@ -158,6 +158,13 @@
 	<i style="margin:15%;">{'The attribute field to use when loading the group members from the group.'|@translate}</i>	
 	</p>
 	<p>
+	<label style="display:inline-block; width:15%;" for="ld_group_member_attr_is_dn">
+        <input type='hidden' value='0' name='LD_GROUP_MEMBER_ATTR_IS_DN'>
+        <input type="checkbox" id="ld_group_member_attr_is_dn" name="LD_GROUP_MEMBER_ATTR_IS_DN" value="1" {if $LD_GROUP_MEMBER_ATTR_IS_DN== 1}checked{/if}>
+	{'Group membership attribute is a DN'|@translate}</label>
+	{if isset($LD_GROUP_MEMBER_ATTR_IS_DN) and $LD_GROUP_MEMBER_ATTR_IS_DN}<i style="color:red;">{$LD_GROUP_MEMBER_ATTR_IS_DN}</i>{/if}
+	</p>
+	<p>
 	<label style="display:inline-block; width:15%;" for="ld_user_member_attr">{'User Membership Attribute:'|@translate}</label>
 	<input size="70" type="text" id="ld_user_member_attr" name="LD_USER_MEMBER_ATTR" value="{$LD_USER_MEMBER_ATTR}" />
 	{if isset($WARN_LD_USER_MEMBER_ATTR) and $WARN_LD_USER_MEMBER_ATTR}<i style="color:red;">{$WARN_LD_USER_MEMBER_ATTR}</i>{/if}<br>

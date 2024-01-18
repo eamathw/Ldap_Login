@@ -50,6 +50,7 @@ if (isset($_POST['save']) or isset($_POST['savetest'])){
 	$me->config['ld_group_desc']   = $_POST['LD_GROUP_DESC'];
 	
 	$me->config['ld_group_member_attr']   = $_POST['LD_GROUP_MEMBER_ATTR'];
+	$me->config['ld_group_member_attr_is_dn']   = $_POST['LD_GROUP_MEMBER_ATTR_IS_DN'];
 	$me->config['ld_user_member_attr']   = $_POST['LD_USER_MEMBER_ATTR'];
 	
 	$me->config['ld_group_user']   = $_POST['LD_GROUP_USER'];
@@ -152,6 +153,7 @@ $template->assign('LD_GROUP_ATTR',$me->check_config('ld_group_attr'));
 $template->assign('LD_GROUP_DESC',$me->check_config('ld_group_desc'));
 
 $template->assign('LD_GROUP_MEMBER_ATTR',$me->check_config('ld_group_member_attr'));
+$template->assign('LD_GROUP_MEMBER_ATTR_IS_DN',$me->check_config('ld_group_member_attr_is_dn'));
 $template->assign('LD_USER_MEMBER_ATTR',$me->check_config('ld_user_member_attr'));
 $template->assign('LD_MEMBERSHIP_USER',$me->check_config('ld_membership_user'));
 

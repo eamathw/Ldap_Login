@@ -25,6 +25,7 @@ class Ldap {
 		'ld_group_desc' => 'description',
 		'ld_group_basedn' => 'cn=groups,dc=domain,dc=tld',
 		'ld_group_member_attr' => 'member',
+		'ld_group_member_attr_is_dn' => 1,
 		'ld_user_member_attr' => 'memberOf',
 		'ld_group_webmaster' => 'cn=piwigo_webmasters,cn=groups,dc=domain,dc=tld',
 		'ld_group_admin' => 'cn=piwigo_admins,cn=groups,dc=domain,dc=tld',
@@ -396,7 +397,12 @@ class Ldap {
                         return false;
                 }
 		
-		$search_filter = "(&(objectclass=$group_class)(cn=$group_cn)($member_attr=$user_dn)($group_filter))"; 
+		if ( $this->config['ld_group_member_attr_is_dn'] ) {
+			$user_member_attr_val = $user_dn;
+		} else {
+			$user_member_attr_val = $user_login;
+		}
+		$search_filter = "(&(objectclass=$group_class)(cn=$group_cn)($member_attr=$user_member_attr_val)($group_filter))"; 
 		$this->write_log("[check_ldap_group_membership]> @ldap_search(\$this->cnx,'$base_dn', '$search_filter','$member_attr') for $group_cn");
 		$search = ldap_search($this->cnx, $base_dn, $search_filter,array($member_attr),0,0,5); //search for group
 		if($search){
